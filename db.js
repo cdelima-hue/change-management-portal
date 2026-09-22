@@ -215,6 +215,7 @@ async function seedInitialDataPostgres() {
 
 module.exports = {
   pool,
+  query: (text, params) => pool.query(text, params),
   initDb,
   initDatabase: initDb,
   isPostgres: () => true
