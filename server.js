@@ -1,4 +1,3 @@
-JavaScript
 const express = require('express');
 const path = require('path');
 const db = require('./db');
@@ -7,12 +6,12 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Inicializar base de datos
+// Inicializar base de dados
 db.initDb().catch(console.error);
 
-// Función para manejar el login de forma segura
+// Função para manejar o login
 const handleLogin = async (req, res) => {
-  const { username, password } = req.body || {};
+  const { username } = req.body || {};
   try {
     const { rows } = await db.query('SELECT * FROM users WHERE username = $1', [username || 'admin']);
     
@@ -47,12 +46,12 @@ const handleLogin = async (req, res) => {
   }
 };
 
-// Rutas de Login (cubren cualquier variante del frontend)
+// Rotas de Login
 app.post('/api/login', handleLogin);
 app.post('/api/auth/login', handleLogin);
 app.post('/login', handleLogin);
 
-// Rutas de Países
+// Rotas de Países
 app.get('/api/countries', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM countries ORDER BY nombre ASC');
@@ -84,7 +83,7 @@ app.delete('/api/countries/:key', async (req, res) => {
   }
 });
 
-// Rutas de Business Services
+// Rotas de Business Services
 app.get('/api/business-services', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM business_services ORDER BY nombre ASC');
@@ -116,7 +115,7 @@ app.delete('/api/business-services/:id', async (req, res) => {
   }
 });
 
-// Rutas de Productos
+// Rotas de Produtos
 app.get('/api/products', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM products ORDER BY nombre ASC');
@@ -148,7 +147,7 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-// Rutas de Changes (Solicitudes)
+// Rotas de Changes
 app.get('/api/changes', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM changes ORDER BY id DESC');
@@ -200,12 +199,12 @@ app.delete('/api/changes/:id', async (req, res) => {
   }
 });
 
-// Fallback para la aplicación web (SPA)
+// Fallback SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor ejecutándose en el puerto ${PORT}`);
+  console.log(`🚀 Servidor a rodar na porta ${PORT}`);
 });
