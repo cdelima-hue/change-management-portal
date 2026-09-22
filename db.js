@@ -5,7 +5,7 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
-// Inicialización del Schema de la Base de Datos
+// Inicialização do Schema da Base de Dados
 async function initDb() {
   const client = await pool.connect();
   try {
@@ -33,7 +33,7 @@ async function initDb() {
       );
     `);
 
-    // 3. Productos
+    // 3. Produtos
     await client.query(`
       CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,
@@ -42,7 +42,7 @@ async function initDb() {
       );
     `);
 
-    // 4. Usuarios
+    // 4. Utilizadores
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -56,7 +56,7 @@ async function initDb() {
       );
     `);
 
-    // 5. Changes (Solicitudes)
+    // 5. Changes (Solicitações)
     await client.query(`
       CREATE TABLE IF NOT EXISTS changes (
         id SERIAL PRIMARY KEY,
@@ -83,7 +83,7 @@ async function initDb() {
       );
     `);
 
-    // 6. Auditoría
+    // 6. Auditoria
     await client.query(`
       CREATE TABLE IF NOT EXISTS audit_logs (
         id SERIAL PRIMARY KEY,
@@ -97,7 +97,7 @@ async function initDb() {
       );
     `);
 
-    // 7. Settings / Configuración Global
+    // 7. Definições Globais
     await client.query(`
       CREATE TABLE IF NOT EXISTS settings (
         key VARCHAR(100) PRIMARY KEY,
@@ -118,7 +118,7 @@ async function initDb() {
   }
 }
 
-// SEEDING DE DATOS INICIALES (SIN CHANGES DE PRUEBA)
+// SEEDING DE DADOS INICIAIS (SEM CHANGES DE TESTE)
 async function seedInitialDataPostgres() {
   // 1. Countries
   const cCount = await pool.query('SELECT COUNT(*) FROM countries');
@@ -164,7 +164,7 @@ async function seedInitialDataPostgres() {
     }
   }
 
-  // 3. Productos
+  // 3. Produtos
   const pCount = await pool.query('SELECT COUNT(*) FROM products');
   if (parseInt(pCount.rows[0].count) === 0) {
     console.log('[DB] Sembrando Productos iniciales...');
@@ -174,7 +174,7 @@ async function seedInitialDataPostgres() {
     }
   }
 
-  // 4. Usuarios
+  // 4. Utilizadores
   const uCount = await pool.query('SELECT COUNT(*) FROM users');
   if (parseInt(uCount.rows[0].count) === 0) {
     console.log('[DB] Sembrando Usuarios iniciales...');
@@ -215,5 +215,6 @@ async function seedInitialDataPostgres() {
 
 module.exports = {
   pool,
-  initDb
+  initDb,
+  initDatabase: initDb
 };
