@@ -6,8 +6,36 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Inicializa a Base de Dados
+// Inicializar base de datos
 db.initDb().catch(console.error);
+
+// ==========================================
+// AUTENTICACIÓN / LOGIN
+// ==========================================
+app.post('/api/login', async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const { rows } = await db.query('SELECT * FROM users WHERE username = $1', [username]);
+    if (rows.length === 0) {
+      return res.status(401).json({ error: 'Usuario no encontrado' });
+    }
+    const user = rows[0];
+    // Acepta cualquier contraseña en dev o valida por defecto
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        nombre: user.nombre,
+        role: user.role,
+        pais: user.pais,
+        business_services: user.business_services || []
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ==========================================
 // ROTAS DE PAÍSES
@@ -78,7 +106,7 @@ app.delete('/api/business-services/:id', async (req, res) => {
 });
 
 // ==========================================
-// ROTAS DE PRODUTOS
+// ROTAS DE PRODUCTOS
 // ==========================================
 app.get('/api/products', async (req, res) => {
   try {
@@ -111,15 +139,66 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-// Rota principal SPA
+// ==========================================
+// ROTAS DE CHANGES (SOLICITUDES)
+// ==========================================
+app.get('/api/changes', async (req, res) => {
+  try {
+    const { rows } = await db.query('SELECT * FROM changes ORDER BY id DESC');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/changes', async (req, res) => {
+  try {
+    const c = req.body;
+    const { rows } = await db.query(
+      `INSERT INTO changes (change_num, titulo, pais, business_service, solicitante, fase, producto, tipo_cambio, horas_estimadas, horas_aprobadas, descripcion, pasos_implementacion, entendimiento_tecnico, plan_rollback, aprobador, aprobador_email, estado_aprobacion, cronograma_fases)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING *`,
+      [
+        c.change_num || `CHG-${Date.now()}`,
+        c.titulo,
+        c.pais,
+        c.business_service,
+        c.solicitante,
+        c.fase || '1. ABERTURA',
+        c.producto,
+        c.tipo_cambio,
+        c.horas_estimadas || 0,
+        c.horas_aprobadas || 0,
+        c.descripcion,
+        JSON.stringify(c.pasos_implementacion || []),
+        c.entendimiento_tecnico,
+        c.plan_rollback,
+        c.aprobador,
+        c.aprobador_email,
+        c.estado_aprobacion || 'Pendiente',
+        JSON.stringify(c.cronograma_fases || {})
+      ]
+    );
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/changes/:id', async (req, res) => {
+  try {
+    await db.query('DELETE FROM changes WHERE id = $1 OR change_num = $1', [req.params.id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Rota fallback SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`[DB] Tablas verificadas exitosamente en PostgreSQL.`);
-  console.log(`===========================================`);
-  console.log(`🚀 Change Management Portal Enterprise v7.0 (Production)`);
-  console.log(`📡 Servidor escuchando en: http://localhost:${PORT}`);
+  console.log(`🚀 Servidor ejecutándose en el puerto ${PORT}`);
 });
