@@ -216,5 +216,6 @@ async function seedInitialDataPostgres() {
 module.exports = {
   pool,
   initDb,
-  initDatabase: initDb
+  initDatabase: initDb,
+  isPostgres: () => true
 };
