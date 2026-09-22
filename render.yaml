@@ -1,0 +1,34 @@
+# render.yaml — Blueprint de Despliegue Automatizado para Render (render.com)
+# Documentación: https://render.com/docs/blueprint-spec
+
+version: "1"
+
+databases:
+  - name: nestle-changes-db
+    databaseName: change_management_db
+    user: nestle_admin
+    plan: free
+    region: oregon
+    ipAllowList: [] # Permite conexiones internas seguras desde los servicios de Render
+
+services:
+  - type: web
+    name: portal-gestion-changes
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nestle-changes-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 10000
