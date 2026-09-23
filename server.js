@@ -6,10 +6,10 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Inicializar base de dados
+// Inicializar base de datos
 db.initDb().catch(console.error);
 
-// Funcao auxiliar para tratar login
+// Función para manejar el login con Permiso Total de Administrador Global
 const handleLogin = async (req, res) => {
   const { username } = req.body || {};
   try {
@@ -27,11 +27,14 @@ const handleLogin = async (req, res) => {
     const userData = {
       id: userObj.id,
       username: userObj.username,
-      nombre: userObj.nombre || 'Claudio Lima',
-      usuario: userObj.nombre || 'Claudio Lima',
-      role: userObj.role || 'Admin Global',
-      pais: userObj.pais,
-      business_services: userObj.business_services || []
+      nombre: 'Claudio Lima',
+      usuario: 'Claudio Lima',
+      role: 'Admin Global',
+      rol: 'Admin Global',
+      esAdmin: true,
+      isAdmin: true,
+      pais: null,
+      business_services: []
     };
 
     res.json({
@@ -41,22 +44,32 @@ const handleLogin = async (req, res) => {
       usuario: userData
     });
   } catch (err) {
-    console.error('Erro no login:', err);
+    console.error('Error en el login:', err);
+    const fallbackUser = {
+      id: 1,
+      username: 'admin',
+      nombre: 'Claudio Lima',
+      usuario: 'Claudio Lima',
+      role: 'Admin Global',
+      rol: 'Admin Global',
+      esAdmin: true,
+      isAdmin: true
+    };
     res.json({
       success: true,
       token: 'token-demo-fallback',
-      user: { id: 1, username: 'admin', nombre: 'Claudio Lima', usuario: 'Claudio Lima', role: 'Admin Global' },
-      usuario: { id: 1, username: 'admin', nombre: 'Claudio Lima', usuario: 'Claudio Lima', role: 'Admin Global' }
+      user: fallbackUser,
+      usuario: fallbackUser
     });
   }
 };
 
-// Rotas de Autenticacao
+// Rutas de Autenticación
 app.post('/api/login', handleLogin);
 app.post('/api/auth/login', handleLogin);
 app.post('/login', handleLogin);
 
-// Utilizadores
+// Usuarios
 app.get('/api/users', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT id, username, nombre, role, pais, business_services FROM users ORDER BY nombre ASC');
@@ -66,12 +79,12 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// Settings & Configs
+// Configuración y Registros
 app.get('/api/settings/report_presets', (req, res) => res.json([]));
 app.get('/api/settings/custom_logo', (req, res) => res.json({ logo: null }));
 app.get('/api/audit-logs', (req, res) => res.json([]));
 
-// Paises
+// Países
 app.get('/api/countries', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM countries ORDER BY nombre ASC');
@@ -135,7 +148,7 @@ app.delete('/api/business-services/:id', async (req, res) => {
   }
 });
 
-// Produtos
+// Productos
 app.get('/api/products', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM products ORDER BY nombre ASC');
@@ -167,7 +180,7 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-// Changes (Solicitacoes)
+// Changes (Solicitudes)
 app.get('/api/changes', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM changes ORDER BY id DESC');
@@ -219,12 +232,12 @@ app.delete('/api/changes/:id', async (req, res) => {
   }
 });
 
-// Fallback SPA
+// Fallback para la aplicación web (SPA)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor a rodar na porta ${PORT}`);
+  console.log(`🚀 Servidor ejecutándose en el puerto ${PORT}`);
 });
