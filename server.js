@@ -9,17 +9,20 @@ app.use(express.static(path.join(__dirname)));
 // Inicializar base de datos
 db.initDb().catch(console.error);
 
-// Objeto de Super Administrador Global
+// Objeto de Super Administrador Global con TODAS las variantes de rol conocidas
 const superAdminUser = {
-  id: 99,
+  id: 1,
   username: 'superadmin',
   nombre: 'Claudio Lima (SuperAdmin)',
   usuario: 'Claudio Lima (SuperAdmin)',
   role: 'Admin Global',
   rol: 'Admin Global',
   perfil: 'Admin Global',
-  role_id: 'admin',
-  type: 'admin',
+  role_id: 'Admin Global',
+  tipo: 'Admin Global',
+  type: 'Admin Global',
+  nivel: 'Admin Global',
+  access_level: 'Admin Global',
   esAdmin: true,
   isAdmin: true,
   activo: true,
@@ -27,7 +30,7 @@ const superAdminUser = {
   business_services: []
 };
 
-// Manejador de Login que devuelve SIEMPRE SuperAdmin Global
+// Manejador de Login
 const handleLogin = async (req, res) => {
   res.json({
     success: true,
@@ -35,7 +38,9 @@ const handleLogin = async (req, res) => {
     token: 'token-superadmin-2026',
     user: superAdminUser,
     usuario: superAdminUser,
-    data: superAdminUser
+    data: superAdminUser,
+    role: 'Admin Global',
+    rol: 'Admin Global'
   });
 };
 
@@ -44,7 +49,7 @@ app.post('/api/login', handleLogin);
 app.post('/api/auth/login', handleLogin);
 app.post('/login', handleLogin);
 
-// Rutas de Usuarios y Perfil Actual
+// Rutas de Usuarios y Perfil
 app.get('/api/users', async (req, res) => {
   res.json([superAdminUser]);
 });
