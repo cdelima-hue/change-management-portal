@@ -41,6 +41,8 @@
 
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="appContainer" class="hidden max-w-[1800px] mx-auto space-y-4">
+    
+    <!-- Header principal -->
     <header class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md shadow-blue-500/20">
@@ -62,7 +64,7 @@
       <div class="flex items-center gap-3">
         <div class="relative group">
           <button id="userMenuBtn" class="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200/80 rounded-xl text-xs font-bold text-slate-700 transition">
-            <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs">C</div>
+            <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold">C</div>
             <span id="headerUserName">Claudio Lima</span>
             <span id="headerUserRoleBadge" class="px-2 py-0.5 text-[10px] bg-blue-100 text-blue-800 rounded-md font-bold">Admin Global</span>
           </button>
@@ -70,12 +72,83 @@
       </div>
     </header>
 
-    <main class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 min-h-[600px]">
-      <div id="tabContent"></div>
+    <!-- Indicadores y Capacidades -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Capacidad del Mes</h3>
+        <div class="flex items-center justify-between text-xs text-slate-600 font-medium">
+          <span>Disponibles: <strong class="text-slate-800">480 h</strong></span>
+          <span>Utilizadas: <strong class="text-slate-800">0 h</strong></span>
+          <span>Restantes: <strong class="text-emerald-600">480 h</strong></span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Indicadores del Periodo</h3>
+        <div class="flex items-center justify-between text-xs text-slate-600 font-medium">
+          <span>% Uso: <strong class="text-blue-600">0%</strong></span>
+          <span>Comprometidas: <strong class="text-slate-800">0 h</strong></span>
+          <span>Changes: <strong class="text-slate-800">0</strong></span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Distribución por Producto</h3>
+        <p class="text-xs text-slate-400 font-medium">Sin datos para mostrar.</p>
+      </div>
+    </div>
+
+    <!-- Navegación de Pestañas (Tabs) -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-2 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center gap-1" id="mainNavTabs">
+        <button id="tabKanban" class="px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white transition">
+          <i class="fa-solid fa-columns mr-1.5"></i> Kanban
+        </button>
+        <button id="tabMatriz" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-table-cells mr-1.5"></i> Matriz
+        </button>
+        <button id="tabDashboard" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-chart-pie mr-1.5"></i> Dashboard
+        </button>
+        <button id="tabReportes" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-chart-line mr-1.5"></i> Reportes & SLA
+        </button>
+        <button id="tabBacklog" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-list-check mr-1.5"></i> Backlog
+        </button>
+        <button id="tabHistorial" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-clock-rotate-left mr-1.5"></i> Historial
+        </button>
+
+        <!-- Pestañas Administrativas Totalmente Habilitadas -->
+        <button id="tabPaises" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-earth-americas mr-1.5 text-blue-600"></i> Países
+        </button>
+        <button id="tabUsuarios" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-users mr-1.5 text-blue-600"></i> Usuarios
+        </button>
+        <button id="tabLogo" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-image mr-1.5 text-blue-600"></i> Logo & Marca
+        </button>
+      </div>
+
+      <div>
+        <button id="btnNuevoChange" class="px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 transition">
+          <i class="fa-solid fa-plus mr-1"></i> + Change
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenedor Dinámico para Tableros y Formularios -->
+    <main id="tabContent" class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm min-h-[500px]">
+      <div id="kanbanBoard" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Columnas del Kanban llenadas por app.js -->
+      </div>
     </main>
+
   </div>
 
-  <!-- CARGA DE SCRIPTS EN ORDEN CORRECTO -->
+  <!-- SCRIPTS EN ORDEN CORRECTO -->
   <script src="api.js"></script>
   <script src="branding.js"></script>
   <script src="config_paises.js"></script>
