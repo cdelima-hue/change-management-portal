@@ -1953,6 +1953,8 @@ async function salvarFormularioChange(event) {
     businessService,
     producto: gv('inpProduto') || 'General',
     descripcion: shortDescription,
+    titulo: shortDescription,
+    title: shortDescription,
     engenheiro: assignedTo,
     horasEstimadas: horasEst,
     horasAprovadas: horasApr,
