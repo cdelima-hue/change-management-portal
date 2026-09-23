@@ -77,78 +77,111 @@
       <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Capacidad del Mes</h3>
         <div class="flex items-center justify-between text-xs text-slate-600 font-medium">
-          <span>Disponibles: <strong class="text-slate-800">480 h</strong></span>
-          <span>Utilizadas: <strong class="text-slate-800">0 h</strong></span>
-          <span>Restantes: <strong class="text-emerald-600">480 h</strong></span>
+          <span>Disponibles: <strong class="text-slate-800" id="capDisponibles">480 h</strong></span>
+          <span>Utilizadas: <strong class="text-slate-800" id="capUtilizadas">0 h</strong></span>
+          <span>Restantes: <strong class="text-emerald-600" id="capRestantes">480 h</strong></span>
         </div>
       </div>
 
       <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Indicadores del Periodo</h3>
         <div class="flex items-center justify-between text-xs text-slate-600 font-medium">
-          <span>% Uso: <strong class="text-blue-600">0%</strong></span>
-          <span>Comprometidas: <strong class="text-slate-800">0 h</strong></span>
-          <span>Changes: <strong class="text-slate-800">0</strong></span>
+          <span>% Uso: <strong class="text-blue-600" id="indUso">0%</strong></span>
+          <span>Comprometidas: <strong class="text-slate-800" id="indComp">0 h</strong></span>
+          <span>Changes: <strong class="text-slate-800" id="indTotal">0</strong></span>
         </div>
       </div>
 
       <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Distribución por Producto</h3>
-        <p class="text-xs text-slate-400 font-medium">Sin datos para mostrar.</p>
+        <p class="text-xs text-slate-400 font-medium" id="distribucionProductoTexto">Sin datos para mostrar.</p>
       </div>
     </div>
 
     <!-- Navegación de Pestañas (Tabs) -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-2 flex flex-wrap items-center justify-between gap-2">
       <div class="flex flex-wrap items-center gap-1" id="mainNavTabs">
-        <button id="tabKanban" class="px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white transition">
+        <button data-tab="kanban" class="tab-btn active px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white transition">
           <i class="fa-solid fa-columns mr-1.5"></i> Kanban
         </button>
-        <button id="tabMatriz" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+        <button data-tab="matriz" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
           <i class="fa-solid fa-table-cells mr-1.5"></i> Matriz
         </button>
-        <button id="tabDashboard" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+        <button data-tab="dashboard" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
           <i class="fa-solid fa-chart-pie mr-1.5"></i> Dashboard
         </button>
-        <button id="tabReportes" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+        <button data-tab="reportes" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
           <i class="fa-solid fa-chart-line mr-1.5"></i> Reportes & SLA
         </button>
-        <button id="tabBacklog" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+        <button data-tab="backlog" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
           <i class="fa-solid fa-list-check mr-1.5"></i> Backlog
         </button>
-        <button id="tabHistorial" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+        <button data-tab="historial" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
           <i class="fa-solid fa-clock-rotate-left mr-1.5"></i> Historial
         </button>
 
-        <!-- Pestañas Administrativas Totalmente Habilitadas -->
-        <button id="tabPaises" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
+        <!-- Pestañas Administrativas Habilitadas -->
+        <button data-tab="paises" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
           <i class="fa-solid fa-earth-americas mr-1.5 text-blue-600"></i> Países
         </button>
-        <button id="tabUsuarios" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
+        <button data-tab="usuarios" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
           <i class="fa-solid fa-users mr-1.5 text-blue-600"></i> Usuarios
         </button>
-        <button id="tabLogo" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
+        <button data-tab="logo" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
           <i class="fa-solid fa-image mr-1.5 text-blue-600"></i> Logo & Marca
         </button>
       </div>
 
       <div>
-        <button id="btnNuevoChange" class="px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 transition">
+        <button id="btnNuevoChange" onclick="if(window.abrirModalNuevoChange) window.abrirModalNuevoChange();" class="px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 transition">
           <i class="fa-solid fa-plus mr-1"></i> + Change
         </button>
       </div>
     </div>
 
-    <!-- Contenedor Dinámico para Tableros y Formularios -->
+    <!-- Contenedor Dinámico Principal -->
     <main id="tabContent" class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm min-h-[500px]">
-      <div id="kanbanBoard" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Columnas del Kanban llenadas por app.js -->
+      <div id="kanbanBoard" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-3">
+        <!-- Las columnas Kanban se inyectan automáticamente por app.js -->
       </div>
     </main>
 
   </div>
 
-  <!-- SCRIPTS EN ORDEN CORRECTO -->
+  <!-- MODAL NUEVO CHANGE -->
+  <div id="modalChange" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between mb-4 border-b pb-3">
+        <h3 class="text-base font-bold text-slate-800">Nuevo Change</h3>
+        <button onclick="document.getElementById('modalChange').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+      </div>
+      <form id="formChange" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Título del Change</label>
+          <input type="text" id="changeTitulo" required class="w-full px-3 py-2 border rounded-xl text-xs bg-slate-50">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">País</label>
+            <select id="changePais" class="w-full px-3 py-2 border rounded-xl text-xs bg-slate-50">
+              <option value="Brasil">Brasil</option>
+              <option value="México">México</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Horas Estimadas</label>
+            <input type="number" id="changeHoras" value="10" class="w-full px-3 py-2 border rounded-xl text-xs bg-slate-50">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="document.getElementById('modalChange').classList.add('hidden')" class="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 rounded-xl">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-blue-600 rounded-xl">Guardar Change</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPTS EM ORDEM COMPLETA DE CARREGAMENTO -->
   <script src="api.js"></script>
   <script src="branding.js"></script>
   <script src="config_paises.js"></script>
