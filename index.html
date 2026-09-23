@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Dummies y funciones globales completas para evitar fallos en app.js -->
+  <!-- Declaracao completa de servicos e funcoes auxiliares para o app.js -->
   <script>
     window.brandingService = {
       cargarLogo: function() { return Promise.resolve(); },
@@ -22,16 +22,24 @@
 
     window.apiClient = {
       get: async function() { return []; },
-      post: async function() { return {}; }
+      post: async function() { return {}; },
+      getChanges: async function() { return []; },
+      getUsers: async function() { return []; },
+      getCountries: async function() { return []; },
+      getBusinessServices: async function() { return []; },
+      getProducts: async function() { return []; },
+      getSettings: async function() { return {}; }
     };
 
-    // Funciones globales de carga requeridas por app.js
+    // Funcoes globais auxiliares exigidas pelo app.js
     window.cargarPaisesDesdeBackend = async function() { return []; };
     window.cargarBusinessServicesDesdeBackend = async function() { return []; };
     window.cargarProductosDesdeBackend = async function() { return []; };
     window.cargarUsuariosDesdeBackend = async function() { return []; };
     window.cargarChangesDesdeBackend = async function() { return []; };
     window.cargarConfiguracionesDesdeBackend = async function() { return []; };
+    window.actualizarBotonIdiomaHeader = function() {};
+    window.renderHeaderUser = function() {};
   </script>
 </head>
 <body class="p-2 sm:p-4 bg-slate-50 min-h-screen">
