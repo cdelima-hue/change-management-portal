@@ -1,26 +1,52 @@
+// Manejador de Autenticación Definitivo para Admin Global
+const adminGlobalUser = {
+  id: 1,
+  username: 'admin',
+  nombre: 'Claudio Lima',
+  usuario: 'Claudio Lima',
+  role: 'Admin Global',
+  rol: 'Admin Global',
+  perfil: 'Admin Global',
+  role_id: 'admin',
+  type: 'admin',
+  esAdmin: true,
+  isAdmin: true,
+  activo: true,
+  pais: null,
+  business_services: []
+};
+
 const authService = {
+  usuarioActual: adminGlobalUser,
+
   getCurrentUser() {
-    return {
-      id: 1,
-      username: 'admin',
-      nombre: 'Claudio Lima',
-      usuario: 'Claudio Lima',
-      role: 'Admin Global',
-      rol: 'Admin Global',
-      perfil: 'Admin Global',
-      esAdmin: true,
-      isAdmin: true,
-      activo: true,
-      pais: null,
-      business_services: []
-    };
+    return adminGlobalUser;
+  },
+
+  obtenerUsuarioActual() {
+    return adminGlobalUser;
+  },
+
+  estaAutenticado() {
+    return true;
+  },
+
+  esAdmin() {
+    return true;
+  },
+
+  esAdminGlobal() {
+    return true;
+  },
+
+  tienePermiso() {
+    return true;
   },
 
   async login(username, password) {
-    const user = this.getCurrentUser();
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    sessionStorage.setItem('currentUser', JSON.stringify(user));
-    return { success: true, user };
+    localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
+    sessionStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
+    return { success: true, user: adminGlobalUser };
   },
 
   logout() {
@@ -30,9 +56,12 @@ const authService = {
   },
 
   inicializar() {
-    const user = this.getCurrentUser();
-    localStorage.setItem('currentUser', JSON.stringify(user));
+    localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
+    sessionStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
   }
 };
 
 window.authService = authService;
+document.addEventListener('DOMContentLoaded', () => {
+  authService.inicializar();
+});
