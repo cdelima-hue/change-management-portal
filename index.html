@@ -11,38 +11,25 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- INJEÇÃO DE PERMISSÃO ADMIN GLOBAL FORÇADA -->
   <script>
-    (function() {
-      const adminGlobalSession = {
-        id: 1,
-        username: 'admin',
-        nombre: 'Claudio Lima',
-        usuario: 'Claudio Lima',
-        role: 'Admin Global',
-        rol: 'Admin Global',
-        perfil: 'Admin Global',
-        esAdmin: true,
-        isAdmin: true,
-        activo: true,
-        pais: null,
-        business_services: []
-      };
-
-      // Injeta no LocalStorage e SessionStorage do navegador
-      localStorage.setItem('currentUser', JSON.stringify(adminGlobalSession));
-      localStorage.setItem('user', JSON.stringify(adminGlobalSession));
-      localStorage.setItem('role', 'Admin Global');
-      localStorage.setItem('userRole', 'Admin Global');
-      sessionStorage.setItem('currentUser', JSON.stringify(adminGlobalSession));
-      sessionStorage.setItem('user', JSON.stringify(adminGlobalSession));
-
-      // Sobreescreve qualquer tentativa do app.js de alterar para Lectura
-      Object.defineProperty(window, 'currentUser', {
-        get: function() { return adminGlobalSession; },
-        set: function(val) { console.log('Bloqueada alteracao de perfil:', val); }
-      });
-    })();
+    // Inicialización previa del perfil como Admin Global
+    const adminSession = {
+      id: 1,
+      username: 'admin',
+      nombre: 'Claudio Lima',
+      usuario: 'Claudio Lima',
+      role: 'Admin Global',
+      rol: 'Admin Global',
+      perfil: 'Admin Global',
+      esAdmin: true,
+      isAdmin: true,
+      activo: true,
+      pais: null,
+      business_services: []
+    };
+    localStorage.setItem('currentUser', JSON.stringify(adminSession));
+    localStorage.setItem('user', JSON.stringify(adminSession));
+    sessionStorage.setItem('currentUser', JSON.stringify(adminSession));
   </script>
 </head>
 <body class="p-2 sm:p-4 bg-slate-50 min-h-screen">
@@ -52,14 +39,14 @@
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 border border-slate-100">
       <div class="text-center mb-8">
         <h1 class="text-2xl font-black text-slate-800 tracking-tight">Portal de Gestión de Changes</h1>
-        <p class="text-slate-500 text-sm mt-1">Inicia sesión para acceder al sistema</p>
+        <p class="text-slate-500 text-sm mt-1">Inicia sesión para acceder al sistema de gestión y capacidad</p>
       </div>
 
       <div id="loginError" class="hidden mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200"></div>
 
-      <form id="loginForm" onsubmit="event.preventDefault(); window.location.reload();">
+      <form id="loginForm">
         <div class="mb-4">
-          <label class="block text-xs font-bold text-slate-700 mb-1">Usuario</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Usuario o Correo Electrónico</label>
           <input type="text" id="loginUsername" value="admin" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
         </div>
         <div class="mb-6">
@@ -67,14 +54,52 @@
           <input type="password" id="loginPassword" value="Nestle2026!" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
         </div>
         <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition text-sm">
-          Iniciar Sesión como Admin Global
+          Iniciar Sesión
         </button>
       </form>
     </div>
   </div>
 
   <!-- APLICACIÓN PRINCIPAL -->
-  <div id="appContainer" class="hidden"></div>
+  <div id="appContainer" class="hidden max-w-[1800px] mx-auto space-y-4">
+    <!-- Header principal -->
+    <header class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md shadow-blue-500/20">
+          <i class="fa-solid fa-diagram-project"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-black text-slate-800 tracking-tight">Portal Gestión de Changes</h1>
+            <span class="px-2 py-0.5 text-[10px] font-extrabold bg-blue-50 text-blue-700 rounded-md border border-blue-200">v6.0 Enterprise</span>
+          </div>
+          <p class="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
+            <span class="inline-flex items-center gap-1 font-semibold text-emerald-600"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online</span>
+            <span>•</span>
+            <span>Regla global: máx. 30h por Change • Control de Roles & SLA</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Selector de usuario arriba a la derecha -->
+        <div class="relative group">
+          <button id="userMenuBtn" class="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200/80 rounded-xl text-xs font-bold text-slate-700 transition">
+            <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs">C</div>
+            <span id="headerUserName">Claudio Lima</span>
+            <span id="headerUserRoleBadge" class="px-2 py-0.5 text-[10px] bg-blue-100 text-blue-800 rounded-md font-bold">Admin Global</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Panel Dashboard / Tabs -->
+    <main class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 min-h-[600px]">
+      <div id="tabContent">
+        <!-- El contenido dinámico de app.js se renderiza aquí -->
+      </div>
+    </main>
+  </div>
 
   <script src="db.js"></script>
   <script src="auth.js"></script>
