@@ -13,7 +13,7 @@
 </head>
 <body class="p-2 sm:p-4 bg-slate-50 min-h-screen">
 
-  <!-- PANTALLA DE LOGIN -->
+  <!-- PANTALLA DE LOGIN (INTACTA) -->
   <div id="loginContainer" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 border border-slate-100">
       <div class="text-center mb-8">
@@ -41,7 +41,6 @@
 
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="appContainer" class="hidden max-w-[1800px] mx-auto space-y-4">
-    <!-- Header principal -->
     <header class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md shadow-blue-500/20">
@@ -74,7 +73,7 @@
       </div>
     </header>
 
-    <!-- Indicadores y Capacidades -->
+    <!-- Indicadores -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Capacidad del Mes</h3>
@@ -100,7 +99,7 @@
       </div>
     </div>
 
-    <!-- Navegación de Pestañas (Tabs) -->
+    <!-- Pestañas de Navegación -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-2 flex flex-wrap items-center justify-between gap-2">
       <div class="flex flex-wrap items-center gap-1" id="mainNavTabs">
         <button onclick="window.trocarAba('kanban', this)" class="btn-aba active px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white transition">
@@ -140,7 +139,7 @@
       </div>
     </div>
 
-    <!-- Contentores Únicos para Rendering -->
+    <!-- Vistas de las Pestañas -->
     <main id="tabContent" class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm min-h-[500px]">
       <div id="kanbanBoard" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
       <div id="matrizView" class="hidden"></div>
@@ -154,14 +153,83 @@
     </main>
   </div>
 
-  <!-- MODALES DEL SISTEMA -->
-  <div id="modalChange" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-3 z-50"></div>
+  <!-- MODAL COMPLETO DE CHANGE (5 CAMPOS OBLIGATORIOS Y BOTÓN GUARDAR) -->
+  <div id="modalChange" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="text-base font-extrabold text-slate-800" id="modalChangeTitle">Gestionar Change</h3>
+        <button onclick="document.getElementById('modalChange').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      </div>
+
+      <form id="formChange" class="space-y-4" onsubmit="event.preventDefault(); window.guardarChangeNativo();">
+        <input type="hidden" id="changeId">
+        
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Título del Change *</label>
+          <input type="text" id="changeTitulo" required class="w-full px-3 py-2 border rounded-xl text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">País *</label>
+            <select id="changePais" required class="w-full px-3 py-2 border rounded-xl text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+              <option value="Brasil">Brasil</option>
+              <option value="México">México</option>
+              <option value="Chile">Chile</option>
+              <option value="Colombia">Colombia</option>
+              <option value="Argentina">Argentina</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Horas Estimadas *</label>
+            <input type="number" id="changeHoras" value="10" required min="1" max="30" class="w-full px-3 py-2 border rounded-xl text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Estado / Columna</label>
+            <select id="changeEstado" class="w-full px-3 py-2 border rounded-xl text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+              <option value="backlog">Backlog</option>
+              <option value="analisis">En Análisis</option>
+              <option value="desarrollo">En Desarrollo</option>
+              <option value="pruebas">En Pruebas</option>
+              <option value="despliegue">Despliegue</option>
+              <option value="completado">Completado</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Asignado a</label>
+            <input type="text" id="changeAsignado" value="Claudio Lima" class="w-full px-3 py-2 border rounded-xl text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="document.getElementById('modalChange').classList.add('hidden')" class="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition">Cancelar</button>
+          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-md shadow-blue-500/20 transition">Guardar Change</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="modalPrimerAcceso" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
   <div id="modalPerfil" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
   <div id="modalCambiarPassVoluntario" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
 
-  <!-- Script de ligacao direta de abas ao app.js -->
+  <!-- CONTROLADORES Y CONEXIÓN DE PESTAÑAS Y MODAL -->
   <script>
+    window.abrirModalNuevo = function() {
+      const modal = document.getElementById('modalChange');
+      if (modal) modal.classList.remove('hidden');
+      if (window.abrirModalNuevoChange) window.abrirModalNuevoChange();
+    };
+
+    window.guardarChangeNativo = function() {
+      document.getElementById('modalChange').classList.add('hidden');
+      if (window.guardarChange) window.guardarChange();
+      if (window.renderizarTodo) window.renderizarTodo();
+    };
+
     window.trocarAba = function(nomeAba, elemento) {
       document.querySelectorAll('.btn-aba').forEach(b => {
         b.classList.remove('bg-blue-600', 'text-white', 'active');
@@ -172,20 +240,31 @@
         elemento.classList.remove('text-slate-600');
       }
 
-      if (typeof window.cambiarTab === 'function') window.cambiarTab(nomeAba);
-      if (typeof window.renderTabContent === 'function') window.renderTabContent(nomeAba);
-      if (typeof window.renderizarTodo === 'function') window.renderizarTodo();
-    };
+      // Ocultar todas las vistas y mostrar la seleccionada
+      ['kanbanBoard', 'matrizView', 'dashboardView', 'reportesView', 'backlogView', 'historialView', 'paisesView', 'usuariosView', 'logoView'].forEach(v => {
+        const el = document.getElementById(v);
+        if (el) el.classList.add('hidden');
+      });
 
-    window.abrirModalNuevo = function() {
-      if (typeof window.abrirModalNuevoChange === 'function') {
-        window.abrirModalNuevoChange();
-      } else if (typeof window.abrirModalChange === 'function') {
-        window.abrirModalChange();
-      } else {
-        const m = document.getElementById('modalChange');
-        if (m) m.classList.remove('hidden');
-      }
+      const vistaMapa = {
+        'kanban': 'kanbanBoard',
+        'matriz': 'matrizView',
+        'dashboard': 'dashboardView',
+        'reportes': 'reportesView',
+        'backlog': 'backlogView',
+        'historial': 'historialView',
+        'paises': 'paisesView',
+        'usuarios': 'usuariosView',
+        'logo': 'logoView'
+      };
+
+      const targetId = vistaMapa[nomeAba] || 'kanbanBoard';
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) targetEl.classList.remove('hidden');
+
+      if (window.cambiarTab) window.cambiarTab(nomeAba);
+      if (window.renderTabContent) window.renderTabContent(nomeAba);
+      if (window.renderizarTodo) window.renderizarTodo();
     };
   </script>
 
