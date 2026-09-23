@@ -23,7 +23,7 @@
 
       <div id="loginError" class="hidden mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200"></div>
 
-      <form id="loginForm">
+      <form id="loginForm" onsubmit="event.preventDefault(); window.authService.login();">
         <div class="mb-4">
           <label class="block text-xs font-bold text-slate-700 mb-1">Usuario o Correo Electrónico</label>
           <input type="text" id="loginUsername" value="admin" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
@@ -32,7 +32,7 @@
           <label class="block text-xs font-bold text-slate-700 mb-1">Contraseña</label>
           <input type="password" id="loginPassword" value="Nestle2026!" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
         </div>
-        <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition text-sm">
+        <button type="submit" id="btnSubmitLogin" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition text-sm">
           Iniciar Sesión
         </button>
       </form>
@@ -42,19 +42,13 @@
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="appContainer" class="hidden"></div>
 
-  <!-- MODAL RECONFIGURADO • CHANGE -->
+  <!-- MODALES DEL SISTEMA -->
   <div id="modalChange" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-3 z-50"></div>
-
-  <!-- MODAL CAMBIO OBLIGATORIO DE CONTRASEÑA -->
   <div id="modalPrimerAcceso" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
-
-  <!-- MODAL MI PERFIL DE USUARIO -->
   <div id="modalPerfil" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
-
-  <!-- MODAL CAMBIAR CONTRASEÑA VOLUNTARIO -->
   <div id="modalCambiarPassVoluntario" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
 
-  <!-- SCRIPTS NATIVOS DE LA APLICACIÓN EN ORDEN EXACTO -->
+  <!-- SCRIPTS NATIVOS -->
   <script src="api.js"></script>
   <script src="branding.js"></script>
   <script src="config_paises.js"></script>
