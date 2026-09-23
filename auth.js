@@ -1,4 +1,4 @@
-// Servico de Autenticacao com Formulario de Login Habilitado
+// Servico de Autenticacao Nativo com Renderizacao Automatica
 const adminGlobalUser = {
   id: 1,
   username: 'admin',
@@ -55,11 +55,8 @@ const authService = {
       appDiv.style.display = 'block';
     }
 
-    if (typeof window.mostrarAppPrincipal === 'function') {
-      window.mostrarAppPrincipal();
-    } else if (typeof window.renderizarTodo === 'function') {
-      window.renderizarTodo();
-    }
+    // Executa a montagem nativa da interface
+    this.executarRender();
     return { success: true, user: adminGlobalUser };
   },
 
@@ -67,6 +64,14 @@ const authService = {
     localStorage.clear();
     sessionStorage.clear();
     window.location.reload();
+  },
+
+  executarRender() {
+    setTimeout(() => {
+      if (typeof window.mostrarAppPrincipal === 'function') window.mostrarAppPrincipal();
+      if (typeof window.renderizarTodo === 'function') window.renderizarTodo();
+      if (typeof window.cargarDatos === 'function') window.cargarDatos();
+    }, 100);
   },
 
   inicializar() {
@@ -80,9 +85,7 @@ const authService = {
         appDiv.classList.remove('hidden');
         appDiv.style.display = 'block';
       }
-      if (typeof window.mostrarAppPrincipal === 'function') {
-        window.mostrarAppPrincipal();
-      }
+      this.executarRender();
     } else {
       if (loginDiv) loginDiv.style.display = 'flex';
       if (appDiv) appDiv.classList.add('hidden');
