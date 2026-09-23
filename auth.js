@@ -1,4 +1,4 @@
-// Servico de Autenticacao com Perfil de Administrador Global NATIVO
+// Servicio de Autenticación compatible con app.js y rol Admin Global
 const adminGlobalUser = {
   id: 1,
   username: 'admin',
@@ -17,6 +17,8 @@ const adminGlobalUser = {
 };
 
 const authService = {
+  usuarioActual: adminGlobalUser,
+
   getCurrentUser() {
     return adminGlobalUser;
   },
@@ -44,6 +46,18 @@ const authService = {
   async login(username, password) {
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
+    
+    // Ocultar pantalla de login y mostrar app principal
+    const loginDiv = document.getElementById('loginContainer');
+    const appDiv = document.getElementById('appContainer');
+    if (loginDiv) loginDiv.classList.add('hidden');
+    if (appDiv) appDiv.classList.remove('hidden');
+
+    if (window.app && typeof window.app.inicializar === 'function') {
+      window.app.inicializar();
+    } else {
+      window.location.reload();
+    }
     return { success: true, user: adminGlobalUser };
   },
 
@@ -54,9 +68,7 @@ const authService = {
   },
 
   inicializar() {
-    if (!localStorage.getItem('currentUser')) {
-      localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
-    }
+    localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
   }
 };
 
