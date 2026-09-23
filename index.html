@@ -13,7 +13,7 @@
 </head>
 <body class="p-2 sm:p-4 bg-slate-50 min-h-screen">
 
-  <!-- PANTALLA DE LOGIN (INTACTA) -->
+  <!-- PANTALLA DE LOGIN -->
   <div id="loginContainer" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 border border-slate-100">
       <div class="text-center mb-8">
@@ -41,119 +41,301 @@
 
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="appContainer" class="hidden max-w-[1800px] mx-auto space-y-4">
-    <header class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-4">
+    
+    <!-- HEADER COMPLETO -->
+    <header class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md shadow-blue-500/20">
+        <div id="headerLogoContainer" class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-emerald-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md">
           <i class="fa-solid fa-diagram-project"></i>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-lg font-black text-slate-800 tracking-tight">Portal Gestión de Changes</h1>
+            <h1 class="text-base font-black text-slate-800 tracking-tight">Portal Gestión de Changes</h1>
             <span class="px-2 py-0.5 text-[10px] font-extrabold bg-blue-50 text-blue-700 rounded-md border border-blue-200">v6.0 Enterprise</span>
           </div>
-          <p class="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
-            <span class="inline-flex items-center gap-1 font-semibold text-emerald-600"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online</span>
+          <p class="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
+            <span class="inline-flex items-center gap-1 font-semibold text-emerald-600"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> En línea (03:36 p.m.)</span>
             <span>•</span>
             <span>Regla global: máx. 30h por Change • Control de Roles & SLA</span>
           </p>
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <button onclick="window.authService.logout()" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold transition mr-2">
-          <i class="fa-solid fa-power-off mr-1"></i> Salir
+      <!-- BOTONES SUPERIORES Y PERFIL -->
+      <div class="flex items-center gap-2">
+        <select id="selectIdioma" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 font-bold text-xs rounded-xl border-none focus:ring-0 cursor-pointer">
+          <option value="es">🇪🇸 Español</option>
+          <option value="pt">🇧🇷 Português</option>
+          <option value="en">🇺🇸 English</option>
+        </select>
+
+        <div class="flex items-center gap-1 px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-700">
+          <i class="fa-regular fa-calendar text-slate-500"></i>
+          <span>Periodo:</span>
+          <span id="labelPeriodoActual">septiembre de 2026</span>
+        </div>
+
+        <button id="btnSync" onclick="if(window.cargarDatos) window.cargarDatos();" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 font-bold text-xs rounded-xl transition flex items-center gap-1.5">
+          <i class="fa-solid fa-rotate text-slate-500"></i> Sync
         </button>
-        <div class="relative group">
-          <button id="userMenuBtn" class="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200/80 rounded-xl text-xs font-bold text-slate-700 transition">
-            <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold">C</div>
-            <span id="headerUserName">Claudio Lima</span>
-            <span id="headerUserRoleBadge" class="px-2 py-0.5 text-[10px] bg-blue-100 text-blue-800 rounded-md font-bold">Admin Global</span>
+
+        <button id="btnExportExcel" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-md shadow-amber-500/20 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-file-excel"></i> Excel
+        </button>
+
+        <button id="btnExportar" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-file-export"></i> Exportar
+        </button>
+
+        <button id="btnNuevoChangeHeader" onclick="if(window.abrirModalNuevoChange) window.abrirModalNuevoChange(); else if(window.abrirModalChange) window.abrirModalChange();" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-plus"></i> + Change
+        </button>
+
+        <div class="relative ml-1">
+          <button id="userMenuBtn" class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200/80 rounded-xl text-xs font-bold text-slate-700 transition">
+            <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-[10px] font-black">CL</div>
+            <div class="text-left">
+              <div id="headerUserName" class="text-xs font-bold text-slate-800 leading-none">Claudio Lima</div>
+              <span id="headerUserRoleBadge" class="text-[9px] font-extrabold text-red-600 leading-none">Admin Global</span>
+            </div>
+            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
           </button>
         </div>
       </div>
     </header>
 
-    <!-- Indicadores -->
+    <!-- METRICAS E INDICADORES ORIGINAVEIS -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
-        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Capacidad del Mes</h3>
-        <div class="flex items-center justify-between text-xs text-slate-600 font-medium">
-          <span>Disponibles: <strong class="text-slate-800" id="capDisponibles">480 h</strong></span>
-          <span>Utilizadas: <strong class="text-slate-800" id="capUtilizadas">0 h</strong></span>
-          <span>Restantes: <strong class="text-emerald-600" id="capRestantes">480 h</strong></span>
+      
+      <!-- Capacity Card -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm relative">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h3 class="text-xs font-black text-slate-700 uppercase tracking-wider">Capacidad del Mes</h3>
+            <p class="text-[10px] text-slate-400 font-medium">Todos los Países: 2560h/mes</p>
+          </div>
+          <span class="px-2 py-0.5 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-200 rounded-md">Máx. 30h por change</span>
+        </div>
+
+        <div class="flex flex-col items-center justify-center py-2">
+          <div class="w-36 h-18 relative flex items-center justify-center">
+            <div class="w-32 h-16 border-t-8 border-l-8 border-r-8 border-slate-200 rounded-t-full"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 text-center border-t border-slate-100 pt-3">
+          <div>
+            <span class="block text-[10px] font-bold text-slate-400 uppercase">DISPONIBLES</span>
+            <strong id="capDisponibles" class="text-xs font-black text-slate-800">2560 h</strong>
+          </div>
+          <div>
+            <span class="block text-[10px] font-bold text-slate-400 uppercase">UTILIZADAS</span>
+            <strong id="capUtilizadas" class="text-xs font-black text-slate-800">0.0 h</strong>
+          </div>
+          <div>
+            <span class="block text-[10px] font-bold text-slate-400 uppercase">RESTANTES</span>
+            <strong id="capRestantes" class="text-xs font-black text-emerald-600">2560.0 h</strong>
+          </div>
         </div>
       </div>
 
+      <!-- Indicators Card -->
       <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
-        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Indicadores del Periodo</h3>
-        <div class="flex items-center justify-between text-xs text-slate-600 font-medium">
-          <span>% Uso: <strong class="text-blue-600" id="indUso">0%</strong></span>
-          <span>Comprometidas: <strong class="text-slate-800" id="indComp">0 h</strong></span>
-          <span>Changes: <strong class="text-slate-800" id="indTotal">0</strong></span>
+        <h3 class="text-xs font-black text-slate-700 uppercase tracking-wider mb-3">Indicadores del Periodo</h3>
+        <div class="grid grid-cols-3 gap-2 text-center mb-2">
+          <div class="bg-slate-50 p-2 rounded-xl">
+            <span class="block text-[9px] font-bold text-slate-400 uppercase">% Uso</span>
+            <strong id="indUso" class="text-xs font-black text-blue-600">0%</strong>
+          </div>
+          <div class="bg-slate-50 p-2 rounded-xl">
+            <span class="block text-[9px] font-bold text-slate-400 uppercase">Comprometidas</span>
+            <strong id="indComp" class="text-xs font-black text-amber-600">0.0 h</strong>
+          </div>
+          <div class="bg-slate-50 p-2 rounded-xl">
+            <span class="block text-[9px] font-bold text-slate-400 uppercase">Changes</span>
+            <strong id="indTotal" class="text-xs font-black text-slate-800">0</strong>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-slate-50 p-2 rounded-xl">
+            <span class="block text-[9px] font-bold text-slate-400 uppercase">Promedio</span>
+            <strong class="text-xs font-black text-slate-800">0 h</strong>
+          </div>
+          <div class="bg-red-50 p-2 rounded-xl border border-red-100">
+            <span class="block text-[9px] font-bold text-red-400 uppercase">Sobre Límite</span>
+            <strong class="text-xs font-black text-red-600">0</strong>
+          </div>
+          <div class="bg-emerald-50 p-2 rounded-xl border border-emerald-100">
+            <span class="block text-[9px] font-bold text-emerald-600 uppercase">Mejoras</span>
+            <strong class="text-xs font-black text-emerald-700">0 Mejoras</strong>
+          </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
-        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Distribución por Producto</h3>
-        <p class="text-xs text-slate-400 font-medium" id="distribucionProductoTexto">Sin datos para mostrar.</p>
+      <!-- Distribution Card -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col justify-between">
+        <h3 class="text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Distribución por Producto</h3>
+        <div class="flex-1 flex items-center justify-center text-slate-400 text-xs font-medium">
+          Sin datos.
+        </div>
       </div>
     </div>
 
-    <!-- Pestañas de Navegación -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-2 flex flex-wrap items-center justify-between gap-2">
-      <div class="flex flex-wrap items-center gap-1" id="mainNavTabs">
-        <button onclick="window.trocarAba('kanban', this)" class="btn-aba active px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white transition">
-          <i class="fa-solid fa-columns mr-1.5"></i> Kanban
-        </button>
-        <button onclick="window.trocarAba('matriz', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
-          <i class="fa-solid fa-table-cells mr-1.5"></i> Matriz
-        </button>
-        <button onclick="window.trocarAba('dashboard', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
-          <i class="fa-solid fa-chart-pie mr-1.5"></i> Dashboard
-        </button>
-        <button onclick="window.trocarAba('reportes', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
-          <i class="fa-solid fa-chart-line mr-1.5"></i> Reportes & SLA
-        </button>
-        <button onclick="window.trocarAba('backlog', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
-          <i class="fa-solid fa-list-check mr-1.5"></i> Backlog
-        </button>
-        <button onclick="window.trocarAba('historial', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
-          <i class="fa-solid fa-clock-rotate-left mr-1.5"></i> Historial
-        </button>
+    <!-- NAVEGAÇÃO DE TABS E BARRA DE FILTROS -->
+    <div class="space-y-3">
+      <!-- Tabs -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-1.5 flex flex-wrap items-center justify-between gap-1">
+        <div class="flex flex-wrap items-center gap-1" id="mainNavTabs">
+          <button data-tab="kanban" class="tab-btn active px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white transition flex items-center gap-1.5">
+            <i class="fa-solid fa-columns"></i> Kanban
+          </button>
+          <button data-tab="matriz" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-table-cells"></i> Matriz
+          </button>
+          <button data-tab="dashboard" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-chart-pie"></i> Dashboard
+          </button>
+          <button data-tab="reportes" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-chart-line"></i> Reportes & SLA
+          </button>
+          <button data-tab="backlog" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-list-check"></i> Backlog
+          </button>
+          <button data-tab="historial" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-clock-rotate-left"></i> Historial
+          </button>
+          <button data-tab="paises" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-earth-americas text-blue-600"></i> Países
+          </button>
+          <button data-tab="usuarios" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-users text-blue-600"></i> Usuarios
+          </button>
+          <button data-tab="logo" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-image text-blue-600"></i> Logo & Marca
+          </button>
+        </div>
 
-        <button onclick="window.trocarAba('paises', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
-          <i class="fa-solid fa-earth-americas mr-1.5 text-blue-600"></i> Países
-        </button>
-        <button onclick="window.trocarAba('usuarios', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
-          <i class="fa-solid fa-users mr-1.5 text-blue-600"></i> Usuarios
-        </button>
-        <button onclick="window.trocarAba('logo', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
-          <i class="fa-solid fa-image mr-1.5 text-blue-600"></i> Logo & Marca
-        </button>
-      </div>
+        <!-- Filtros em linha exatamente como na foto -->
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+            <input type="text" id="filterSearch" placeholder="Buscar..." class="pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs w-36 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+          </div>
 
-      <div>
-        <button id="btnNuevoChange" onclick="window.abrirModalNuevo()" class="px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 transition">
-          <i class="fa-solid fa-plus mr-1"></i> + Change
-        </button>
+          <select id="filterPais" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium focus:outline-none">
+            <option value="">Todos los Países</option>
+          </select>
+
+          <select id="filterSolicitante" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium focus:outline-none">
+            <option value="">Solicitantes</option>
+          </select>
+
+          <select id="filterBusinessService" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium focus:outline-none">
+            <option value="">Business Services</option>
+          </select>
+
+          <select id="filterProducto" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium focus:outline-none">
+            <option value="">Productos</option>
+          </select>
+
+          <select id="filterEstado" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium focus:outline-none">
+            <option value="">Estados</option>
+          </select>
+        </div>
       </div>
     </div>
 
-    <!-- Vistas de las Pestañas -->
-    <main id="tabContent" class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm min-h-[500px]">
-      <div id="kanbanBoard" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
-      <div id="matrizView" class="hidden"></div>
-      <div id="dashboardView" class="hidden"></div>
-      <div id="reportesView" class="hidden"></div>
-      <div id="backlogView" class="hidden"></div>
-      <div id="historialView" class="hidden"></div>
-      <div id="paisesView" class="hidden"></div>
-      <div id="usuariosView" class="hidden"></div>
-      <div id="logoView" class="hidden"></div>
+    <!-- QUADRO KANBAN COM AS 8 COLUNAS EXATAS DA IMAGEM -->
+    <main id="tabContent" class="bg-transparent">
+      <div id="kanbanBoard" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-3">
+        
+        <!-- 1. ABERTURA -->
+        <div class="bg-slate-100/70 rounded-2xl p-3 border border-slate-200/60 min-h-[500px]">
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
+            <h4 class="text-xs font-black text-slate-700 tracking-tight">1. ABERTURA</h4>
+            <span class="w-5 h-5 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+          </div>
+          <div class="kanban-col-content space-y-2" data-estado="ABERTURA"></div>
+        </div>
+
+        <!-- 2. REUNIÃO -->
+        <div class="bg-slate-100/70 rounded-2xl p-3 border border-slate-200/60 min-h-[500px]">
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
+            <h4 class="text-xs font-black text-slate-700 tracking-tight">2. REUNIÃO</h4>
+            <span class="w-5 h-5 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+          </div>
+          <div class="kanban-col-content space-y-2" data-estado="REUNIÃO"></div>
+        </div>
+
+        <!-- 3. ANÁLISE -->
+        <div class="bg-slate-100/70 rounded-2xl p-3 border border-slate-200/60 min-h-[500px]">
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
+            <h4 class="text-xs font-black text-slate-700 tracking-tight">3. ANÁLISE</h4>
+            <span class="w-5 h-5 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+          </div>
+          <div class="kanban-col-content space-y-2" data-estado="ANÁLISE"></div>
+        </div>
+
+        <!-- 4. COMITÊ -->
+        <div class="bg-slate-100/70 rounded-2xl p-3 border border-slate-200/60 min-h-[500px]">
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
+            <h4 class="text-xs font-black text-slate-700 tracking-tight">4. COMITÊ</h4>
+            <span class="w-5 h-5 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+          </div>
+          <div class="kanban-col-content space-y-2" data-estado="COMITÊ"></div>
+        </div>
+
+        <!-- 5. APRESENTAÇÃO -->
+        <div class="bg-slate-100/70 rounded-2xl p-3 border border-slate-200/60 min-h-[500px]">
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
+            <h4 class="text-xs font-black text-blue-700 tracking-tight">5. APRESENTAÇÃO</h4>
+            <span class="w-5 h-5 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+          </div>
+          <div class="kanban-col-content space-y-2" data-estado="APRESENTAÇÃO"></div>
+        </div>
+
+        <!-- 6. APROVAÇÃO -->
+        <div class="bg-emerald-50/50 rounded-2xl p-3 border border-emerald-200/60 min-h-[500px]">
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-emerald-200">
+            <h4 class="text-xs font-black text-emerald-800 tracking-tight">6. APROVAÇÃO</h4>
+            <span class="w-5 h-5 bg-emerald-200 text-emerald-800 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+          </div>
+          <div class="kanban-col-content space-y-2" data-estado="APROVAÇÃO"></div>
+        </div>
+
+        <!-- 7. EXECUÇÃO -->
+        <div class="bg-blue-50/50 rounded-2xl p-3 border border-blue-200/60 min-h-[500px]">
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-blue-200">
+            <h4 class="text-xs font-black text-blue-800 tracking-tight">7. EXECUÇÃO</h4>
+            <span class="w-5 h-5 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+          </div>
+          <div class="kanban-col-content space-y-2" data-estado="EXECUÇÃO"></div>
+        </div>
+
+        <!-- 8. CONCLUÍDA -->
+        <div class="bg-emerald-50/50 rounded-2xl p-3 border border-emerald-200/60 min-h-[500px]">
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-emerald-200">
+            <h4 class="text-xs font-black text-emerald-800 tracking-tight">8. CONCLUÍDA</h4>
+            <span class="w-5 h-5 bg-emerald-200 text-emerald-800 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+          </div>
+          <div class="kanban-col-content space-y-2" data-estado="CONCLUÍDA"></div>
+        </div>
+
+      </div>
+
+      <!-- VISTAS ADICIONAIS -->
+      <div id="matrizView" class="hidden bg-white p-6 rounded-2xl border"></div>
+      <div id="dashboardView" class="hidden bg-white p-6 rounded-2xl border"></div>
+      <div id="reportesView" class="hidden bg-white p-6 rounded-2xl border"></div>
+      <div id="backlogView" class="hidden bg-white p-6 rounded-2xl border"></div>
+      <div id="historialView" class="hidden bg-white p-6 rounded-2xl border"></div>
+      <div id="paisesView" class="hidden bg-white p-6 rounded-2xl border"></div>
+      <div id="usuariosView" class="hidden bg-white p-6 rounded-2xl border"></div>
+      <div id="logoView" class="hidden bg-white p-6 rounded-2xl border"></div>
     </main>
   </div>
 
-  <!-- MODAL COMPLETO DE CHANGE (5 CAMPOS OBLIGATORIOS Y BOTÓN GUARDAR) -->
+  <!-- MODAL COMPLETO DE CHANGE -->
   <div id="modalChange" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 space-y-4">
       <div class="flex items-center justify-between border-b pb-3">
@@ -190,12 +372,14 @@
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Estado / Columna</label>
             <select id="changeEstado" class="w-full px-3 py-2 border rounded-xl text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
-              <option value="backlog">Backlog</option>
-              <option value="analisis">En Análisis</option>
-              <option value="desarrollo">En Desarrollo</option>
-              <option value="pruebas">En Pruebas</option>
-              <option value="despliegue">Despliegue</option>
-              <option value="completado">Completado</option>
+              <option value="1. ABERTURA">1. ABERTURA</option>
+              <option value="2. REUNIÃO">2. REUNIÃO</option>
+              <option value="3. ANÁLISE">3. ANÁLISE</option>
+              <option value="4. COMITÊ">4. COMITÊ</option>
+              <option value="5. APRESENTAÇÃO">5. APRESENTAÇÃO</option>
+              <option value="6. APROVAÇÃO">6. APROVAÇÃO</option>
+              <option value="7. EXECUÇÃO">7. EXECUÇÃO</option>
+              <option value="8. CONCLUÍDA">8. CONCLUÍDA</option>
             </select>
           </div>
           <div>
@@ -216,54 +400,16 @@
   <div id="modalPerfil" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
   <div id="modalCambiarPassVoluntario" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
 
-  <!-- CONTROLADORES Y CONEXIÓN DE PESTAÑAS Y MODAL -->
+  <!-- CONTROLADORES NATIVOS -->
   <script>
-    window.abrirModalNuevo = function() {
+    window.abrirModalNuevoChange = function() {
       const modal = document.getElementById('modalChange');
       if (modal) modal.classList.remove('hidden');
-      if (window.abrirModalNuevoChange) window.abrirModalNuevoChange();
     };
 
     window.guardarChangeNativo = function() {
       document.getElementById('modalChange').classList.add('hidden');
       if (window.guardarChange) window.guardarChange();
-      if (window.renderizarTodo) window.renderizarTodo();
-    };
-
-    window.trocarAba = function(nomeAba, elemento) {
-      document.querySelectorAll('.btn-aba').forEach(b => {
-        b.classList.remove('bg-blue-600', 'text-white', 'active');
-        b.classList.add('text-slate-600');
-      });
-      if (elemento) {
-        elemento.classList.add('bg-blue-600', 'text-white', 'active');
-        elemento.classList.remove('text-slate-600');
-      }
-
-      // Ocultar todas las vistas y mostrar la seleccionada
-      ['kanbanBoard', 'matrizView', 'dashboardView', 'reportesView', 'backlogView', 'historialView', 'paisesView', 'usuariosView', 'logoView'].forEach(v => {
-        const el = document.getElementById(v);
-        if (el) el.classList.add('hidden');
-      });
-
-      const vistaMapa = {
-        'kanban': 'kanbanBoard',
-        'matriz': 'matrizView',
-        'dashboard': 'dashboardView',
-        'reportes': 'reportesView',
-        'backlog': 'backlogView',
-        'historial': 'historialView',
-        'paises': 'paisesView',
-        'usuarios': 'usuariosView',
-        'logo': 'logoView'
-      };
-
-      const targetId = vistaMapa[nomeAba] || 'kanbanBoard';
-      const targetEl = document.getElementById(targetId);
-      if (targetEl) targetEl.classList.remove('hidden');
-
-      if (window.cambiarTab) window.cambiarTab(nomeAba);
-      if (window.renderTabContent) window.renderTabContent(nomeAba);
       if (window.renderizarTodo) window.renderizarTodo();
     };
   </script>
