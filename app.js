@@ -658,11 +658,16 @@ function renderizarTablaAdminPaises() {
 
 async function handleEliminarPais(key) {
   if (!confirm(`¿Eliminar el país "${key}" de la base de datos?`)) return;
-  const res = await eliminarPais(key);
-  mostrarToast(`País eliminado`, 'warning');
+  
+  if (typeof eliminarPais === 'function') {
+    await eliminarPais(key);
+  }
+
+  mostrarToast(`País ${key} eliminado con éxito`, 'warning');
   poblarFiltroPaises();
   poblarSelectPaisFormulario();
   renderizarTablaAdminPaises();
+  renderizarConfigPaises();
   renderizarTodo();
 }
 
@@ -1034,7 +1039,7 @@ async function moverChangeDeFase(changeId, nuevaFase) {
   ch.faseAtual = nuevaFase;
   ch.ultimaModificacao = new Date().toISOString();
   ch.modificadoPor = user;
-
+  localStorage.setItem('nestle_changes_v4', JSON.stringify(appState.changes));
   const fo = FASES_KEY_MAP[nuevaFase];
   if (fo && !ch[fo.dKey]) ch[fo.dKey] = new Date().toISOString().split('T')[0];
 
