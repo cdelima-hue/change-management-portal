@@ -9,13 +9,13 @@ app.use(express.static(path.join(__dirname)));
 // Inicializar base de dados
 db.initDb().catch(console.error);
 
-// Função para manejar o login
+// Funcao auxiliar para tratar login
 const handleLogin = async (req, res) => {
   const { username } = req.body || {};
   try {
     const { rows } = await db.query('SELECT * FROM users WHERE username = $1', [username || 'admin']);
     
-    const user = rows.length > 0 ? rows[0] : {
+    const userObj = rows.length > 0 ? rows[0] : {
       id: 1,
       username: username || 'admin',
       nombre: 'Claudio Lima',
@@ -24,34 +24,54 @@ const handleLogin = async (req, res) => {
       business_services: []
     };
 
+    const userData = {
+      id: userObj.id,
+      username: userObj.username,
+      nombre: userObj.nombre || 'Claudio Lima',
+      usuario: userObj.nombre || 'Claudio Lima',
+      role: userObj.role || 'Admin Global',
+      pais: userObj.pais,
+      business_services: userObj.business_services || []
+    };
+
     res.json({
       success: true,
       token: 'token-demo-production-2026',
-      user: {
-        id: user.id,
-        username: user.username,
-        nombre: user.nombre || 'Claudio Lima',
-        role: user.role || 'Admin Global',
-        pais: user.pais,
-        business_services: user.business_services || []
-      }
+      user: userData,
+      usuario: userData
     });
   } catch (err) {
-    console.error('Error en el login:', err);
+    console.error('Erro no login:', err);
     res.json({
       success: true,
       token: 'token-demo-fallback',
-      user: { id: 1, username: 'admin', nombre: 'Claudio Lima', role: 'Admin Global' }
+      user: { id: 1, username: 'admin', nombre: 'Claudio Lima', usuario: 'Claudio Lima', role: 'Admin Global' },
+      usuario: { id: 1, username: 'admin', nombre: 'Claudio Lima', usuario: 'Claudio Lima', role: 'Admin Global' }
     });
   }
 };
 
-// Rotas de Login
+// Rotas de Autenticacao
 app.post('/api/login', handleLogin);
 app.post('/api/auth/login', handleLogin);
 app.post('/login', handleLogin);
 
-// Rotas de Países
+// Utilizadores
+app.get('/api/users', async (req, res) => {
+  try {
+    const { rows } = await db.query('SELECT id, username, nombre, role, pais, business_services FROM users ORDER BY nombre ASC');
+    res.json(rows);
+  } catch (err) {
+    res.json([]);
+  }
+});
+
+// Settings & Configs
+app.get('/api/settings/report_presets', (req, res) => res.json([]));
+app.get('/api/settings/custom_logo', (req, res) => res.json({ logo: null }));
+app.get('/api/audit-logs', (req, res) => res.json([]));
+
+// Paises
 app.get('/api/countries', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM countries ORDER BY nombre ASC');
@@ -83,7 +103,7 @@ app.delete('/api/countries/:key', async (req, res) => {
   }
 });
 
-// Rotas de Business Services
+// Business Services
 app.get('/api/business-services', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM business_services ORDER BY nombre ASC');
@@ -115,7 +135,7 @@ app.delete('/api/business-services/:id', async (req, res) => {
   }
 });
 
-// Rotas de Produtos
+// Produtos
 app.get('/api/products', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM products ORDER BY nombre ASC');
@@ -147,7 +167,7 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-// Rotas de Changes
+// Changes (Solicitacoes)
 app.get('/api/changes', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM changes ORDER BY id DESC');
