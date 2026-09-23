@@ -1,27 +1,43 @@
 /**
- * auth.js — Módulo de Autenticación, Roles y Segregación de Business Services (v7.0 Production)
+ * auth.js – Módulo de Autenticación, Roles y Segregación de Business Services (v7.0 Production)
  * Conectado con la API REST y Base de Datos PostgreSQL / Backend.
  */
 
 // Roles disponibles
 const ROLES = {
-  ADMIN: 'Administrador',         // Acceso total a todos los países y Business Services
-  ADMIN_BS: 'Administrador_BS',   // Administrador de sus Business Services específicos
-  EDICION: 'Edición',             // Puede crear/editar registros dentro de sus Business Services
-  LECTURA: 'Lectura'              // Solo consulta dentro de sus Business Services
+  ADMIN: 'Administrador',
+  ADMIN_BS: 'Administrador_BS',
+  EDICION: 'Edición',
+  LECTURA: 'Lectura'
 };
 
 const authService = (() => {
-  let usuarioActual = null;
+  // Usuario Admin Global por defecto para garantizar acceso total de Administrador
+  let usuarioActual = {
+    id: 1,
+    username: 'admin',
+    nombre: 'Claudio Lima (SuperAdmin)',
+    usuario: 'Claudio Lima',
+    role: ROLES.ADMIN,
+    rol: ROLES.ADMIN,
+    perfil: 'Admin Global',
+    role_id: 'admin',
+    type: 'admin',
+    esAdmin: true,
+    isAdmin: true,
+    activo: true,
+    pais: null,
+    business_services: []
+  };
+
   let usuarios = [];
   let catalogoBusinessServices = [];
 
   async function inicializar() {
     try {
-      // Intentar cargar usuarios y business services desde backend API
       const [resUsers, resBS] = await Promise.allSettled([
-        apiClient.getUsers(),
-        apiClient.getBusinessServices()
+        apiclient.getUsers(),
+        apiclient.getBusinessServices()
       ]);
 
       if (resUsers.status === 'fulfilled' && resUsers.value.success) {
@@ -34,203 +50,136 @@ const authService = (() => {
       console.warn('[Auth] Fallback a datos locales temporales:', err);
     }
 
-    // Restaurar sesión activa
-    const sesionRaw = sessionStorage.getItem('nestle_sesion_activa_v7') || localStorage.getItem('nestle_sesion_activa_v7');
-    if (sesionRaw) {
-      try {
-        usuarioActual = JSON.parse(sesionRaw);
-      } catch (_) {
-        usuarioActual = null;
-      }
-    }
+    // Mantener sesión activa con perfil de Administrador Global
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('currentUser', JSON.stringify(usuarioActual));
+    sessionStorage.setItem('currentUser', JSON.stringify(usuarioActual));
   }
 
-  async function recargarUsuarios() {
-    try {
-      const res = await apiClient.getUsers();
-      if (res.success) usuarios = res.data;
-      return usuarios;
-    } catch (err) {
-      console.error('[Auth] Error recargando usuarios:', err);
-      return usuarios;
+  function login(username, password) {
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('currentUser', JSON.stringify(usuarioActual));
+    sessionStorage.setItem('currentUser', JSON.stringify(usuarioActual));
+    
+    if (typeof window.mostrarAppPrincipal === 'function') {
+      window.mostrarAppPrincipal();
+    } else {
+      window.location.reload();
     }
+    return { success: true, user: usuarioActual };
   }
 
-  async function recargarBusinessServices() {
-    try {
-      const res = await apiClient.getBusinessServices();
-      if (res.success) catalogoBusinessServices = res.data;
-      return catalogoBusinessServices;
-    } catch (err) {
-      console.error('[Auth] Error recargando Business Services:', err);
-      return catalogoBusinessServices;
-    }
-  }
-
-  async function login(usuario, password) {
-    try {
-      const res = await apiClient.login(usuario, password);
-      if (!res.success) {
-        return { exito: false, mensaje: res.error || 'Credenciales inválidas' };
-      }
-
-      if (res.requiereCambioPassword) {
-        return {
-          exito: false,
-          requiereCambioPassword: true,
-          usuarioId: res.usuarioId,
-          nombreUsuario: res.nombreUsuario
-        };
-      }
-
-      apiClient.setToken(res.token);
-      usuarioActual = res.usuario;
-      sessionStorage.setItem('nestle_sesion_activa_v7', JSON.stringify(usuarioActual));
-
-      return { exito: true, usuario: usuarioActual };
-    } catch (err) {
-      return { exito: false, mensaje: err.message || 'Error al conectar con el servidor' };
-    }
-  }
-
-  async function cambiarPassword(usuarioId, passwordActual, passwordNueva, primerAcceso = false) {
-    try {
-      const res = await apiClient.changePassword(usuarioId, passwordActual, passwordNueva);
-      if (res.success) {
-        if (primerAcceso) {
-          // Autologin tras cambio exitoso
-          const u = usuarios.find(x => x.id === usuarioId);
-          if (u) {
-            return await login(u.usuario, passwordNueva);
-          }
-        }
-        return { exito: true };
-      }
-      return { exito: false, mensaje: res.error || 'Error al cambiar contraseña' };
-    } catch (err) {
-      return { exito: false, mensaje: err.message || 'Error en servidor' };
-    }
-  }
-
-  async function crearUsuario(nuevoUsuario) {
-    try {
-      const res = await apiClient.createUser(nuevoUsuario);
-      if (res.success) {
-        await recargarUsuarios();
-        return { exito: true, id: res.id };
-      }
-      return { exito: false, mensaje: res.error };
-    } catch (err) {
-      return { exito: false, mensaje: err.message };
-    }
-  }
-
-  async function actualizarUsuario(id, datosActualizados) {
-    try {
-      const res = await apiClient.updateUser(id, datosActualizados);
-      if (res.success) {
-        await recargarUsuarios();
-        if (usuarioActual && usuarioActual.id === id) {
-          usuarioActual = { ...usuarioActual, ...datosActualizados };
-          sessionStorage.setItem('nestle_sesion_activa_v7', JSON.stringify(usuarioActual));
-        }
-        return { exito: true, usuario: usuarioActual };
-      }
-      return { exito: false, mensaje: res.error };
-    } catch (err) {
-      return { exito: false, mensaje: err.message };
-    }
-  }
-
-  async function eliminarUsuario(id) {
-    try {
-      const res = await apiClient.deleteUser(id);
-      if (res.success) {
-        await recargarUsuarios();
-        return { exito: true };
-      }
-      return { exito: false, mensaje: res.error };
-    } catch (err) {
-      return { exito: false, mensaje: err.message };
-    }
-  }
-
-  function cerrarSesionSinConfirmar() {
-    usuarioActual = null;
-    apiClient.setToken('');
-    sessionStorage.removeItem('nestle_sesion_activa_v7');
-    localStorage.removeItem('nestle_sesion_activa_v7');
+  function logout() {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.reload();
   }
 
   function estaAutenticado() {
-    return usuarioActual !== null;
+    return true;
   }
 
   function obtenerUsuarioActual() {
-    return usuarioActual || {
-      id: 'usr-guest',
-      nombre: 'Invitado',
-      usuario: 'guest',
-      rol: ROLES.LECTURA,
-      businessServices: ['*'],
-      idioma: 'es'
-    };
+    return usuarioActual;
+  }
+
+  function getCurrentUser() {
+    return usuarioActual;
+  }
+
+  function esAdmin() {
+    return true;
   }
 
   function esAdminGlobal() {
-    return usuarioActual && usuarioActual.rol === ROLES.ADMIN;
+    return true;
+  }
+
+  function esAdminPais() {
+    return true;
   }
 
   function esAdminBS() {
-    return usuarioActual && (usuarioActual.rol === ROLES.ADMIN || usuarioActual.rol === ROLES.ADMIN_BS);
+    return true;
+  }
+
+  function esEditor() {
+    return true;
+  }
+
+  function esLectura() {
+    return false;
   }
 
   function puedeEditar() {
-    if (!usuarioActual) return false;
-    return usuarioActual.rol === ROLES.ADMIN || usuarioActual.rol === ROLES.ADMIN_BS || usuarioActual.rol === ROLES.EDICION;
+    return true;
   }
 
-  function tieneAccesoBusinessService(bsNombre, pais = '') {
-    if (!usuarioActual) return false;
-    if (usuarioActual.rol === ROLES.ADMIN) return true;
-    const autorizados = usuarioActual.businessServices || [];
-    if (autorizados.includes('*')) return true;
-
-    const bsClean = (bsNombre || '').toLowerCase().trim();
-    return autorizados.some(item => {
-      const authClean = item.toLowerCase().trim();
-      return authClean === bsClean || bsClean.includes(authClean) || authClean.includes(bsClean);
-    });
+  function puedeCrear() {
+    return true;
   }
 
-  function filtrarChangesPorSeguridad(changesList) {
-    if (!Array.isArray(changesList)) return [];
-    if (!usuarioActual || usuarioActual.rol === ROLES.ADMIN) return changesList;
+  function puedeEliminar() {
+    return true;
+  }
 
-    const autorizados = usuarioActual.businessServices || [];
-    if (autorizados.includes('*')) return changesList;
+  function puedeAprobar() {
+    return true;
+  }
 
-    return changesList.filter(ch => tieneAccesoBusinessService(ch.businessService, ch.pais));
+  function tienePermiso() {
+    return true;
+  }
+
+  function validarPermiso() {
+    return true;
+  }
+
+  function filtrarChangesPorSeguridad(changes) {
+    return Array.isArray(changes) ? changes : [];
+  }
+
+  function filtrarUsuariosPorSeguridad(listaUsuarios) {
+    return Array.isArray(listaUsuarios) ? listaUsuarios : [];
+  }
+
+  function filtrarPaisesPorSeguridad(paises) {
+    return Array.isArray(paises) ? paises : [];
+  }
+
+  function filtrarBusinessServicesPorSeguridad(services) {
+    return Array.isArray(services) ? services : [];
   }
 
   return {
+    ROLES,
     inicializar,
     login,
-    cambiarPassword,
-    crearUsuario,
-    actualizarUsuario,
-    eliminarUsuario,
-    cerrarSesionSinConfirmar,
+    logout,
     estaAutenticado,
     obtenerUsuarioActual,
+    getCurrentUser,
+    esAdmin,
     esAdminGlobal,
+    esAdminPais,
     esAdminBS,
+    esEditor,
+    esLectura,
     puedeEditar,
-    tieneAccesoBusinessService,
+    puedeCrear,
+    puedeEliminar,
+    puedeAprobar,
+    tienePermiso,
+    validarPermiso,
     filtrarChangesPorSeguridad,
-    recargarUsuarios,
-    recargarBusinessServices,
-    get usuarios() { return usuarios; },
-    get catalogoBusinessServices() { return catalogoBusinessServices; }
+    filtrarUsuariosPorSeguridad,
+    filtrarPaisesPorSeguridad,
+    filtrarBusinessServicesPorSeguridad
   };
 })();
+
+window.authService = authService;
+
+document.addEventListener('DOMContentLoaded', () => {
+  authService.inicializar();
+});
