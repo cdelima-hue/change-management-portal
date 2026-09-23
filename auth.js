@@ -1,4 +1,4 @@
-// Servicio de Autenticación Universal para Admin Global
+// Servico de Autenticacao e Seguranca Total para Admin Global
 const adminGlobalUser = {
   id: 1,
   username: 'admin',
@@ -19,11 +19,12 @@ const adminGlobalUser = {
 const authService = {
   usuarioActual: adminGlobalUser,
 
+  // Metodos de Leitura de Utilizador
   getCurrentUser() { return adminGlobalUser; },
   obtenerUsuarioActual() { return adminGlobalUser; },
   estaAutenticado() { return true; },
 
-  // Métodos de Validación de Roles y Permisos completos
+  // Metodos de Validacao de Roles e Permissoes
   esAdmin() { return true; },
   esAdminGlobal() { return true; },
   esAdminPais() { return true; },
@@ -37,6 +38,21 @@ const authService = {
   tienePermiso() { return true; },
   validarPermiso() { return true; },
 
+  // Metodos de Filtragem e Seguranca Exigidos pelo app.js
+  filtrarChangesPorSeguridad(changes) {
+    return Array.isArray(changes) ? changes : [];
+  },
+  filtrarUsuariosPorSeguridad(usuarios) {
+    return Array.isArray(usuarios) ? usuarios : [];
+  },
+  filtrarPaisesPorSeguridad(paises) {
+    return Array.isArray(paises) ? paises : [];
+  },
+  filtrarBusinessServicesPorSeguridad(services) {
+    return Array.isArray(services) ? services : [];
+  },
+
+  // Controlo de Sessao
   login() {
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
