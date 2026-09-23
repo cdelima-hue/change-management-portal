@@ -12,7 +12,19 @@ const ROLES = {
 };
 
 const authService = (() => {
-  let usuarioActual = null;
+  let usuarioActual = {
+  id: 1,
+  username: 'admin',
+  nombre: 'Claudio Lima (SuperAdmin)',
+  usuario: 'Claudio Lima',
+  role: ROLES.ADMIN,
+  rol: 'Administrador',
+  perfil: 'Admin Global',
+  businessServices: ['*'],
+  esAdmin: true,
+  isAdmin: true,
+  activo: true
+};
   let usuarios = [];
   let catalogoBusinessServices = [];
 
