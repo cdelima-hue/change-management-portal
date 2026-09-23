@@ -1,100 +1,236 @@
-// Servico de Autenticacao Nativo com Renderizacao Automatica
-const adminGlobalUser = {
-  id: 1,
-  username: 'admin',
-  nombre: 'Claudio Lima',
-  usuario: 'Claudio Lima',
-  role: 'Admin Global',
-  rol: 'Admin Global',
-  perfil: 'Admin Global',
-  role_id: 'admin',
-  type: 'admin',
-  esAdmin: true,
-  isAdmin: true,
-  activo: true,
-  pais: null,
-  business_services: []
+/**
+ * auth.js — Módulo de Autenticación, Roles y Segregación de Business Services (v7.0 Production)
+ * Conectado con la API REST y Base de Datos PostgreSQL / Backend.
+ */
+
+// Roles disponibles
+const ROLES = {
+  ADMIN: 'Administrador',         // Acceso total a todos los países y Business Services
+  ADMIN_BS: 'Administrador_BS',   // Administrador de sus Business Services específicos
+  EDICION: 'Edición',             // Puede crear/editar registros dentro de sus Business Services
+  LECTURA: 'Lectura'              // Solo consulta dentro de sus Business Services
 };
 
-const authService = {
-  usuarioActual: adminGlobalUser,
+const authService = (() => {
+  let usuarioActual = null;
+  let usuarios = [];
+  let catalogoBusinessServices = [];
 
-  getCurrentUser() { return adminGlobalUser; },
-  obtenerUsuarioActual() { return adminGlobalUser; },
-  estaAutenticado() { return localStorage.getItem('isLoggedIn') === 'true'; },
+  async function inicializar() {
+    try {
+      // Intentar cargar usuarios y business services desde backend API
+      const [resUsers, resBS] = await Promise.allSettled([
+        apiClient.getUsers(),
+        apiClient.getBusinessServices()
+      ]);
 
-  esAdmin() { return true; },
-  esAdminGlobal() { return true; },
-  esAdminPais() { return true; },
-  esAdminBS() { return true; },
-  esEditor() { return true; },
-  esLectura() { return false; },
-  puedeEditar() { return true; },
-  puedeCrear() { return true; },
-  puedeEliminar() { return true; },
-  puedeAprobar() { return true; },
-  tienePermiso() { return true; },
-  validarPermiso() { return true; },
-
-  filtrarChangesPorSeguridad(changes) { return Array.isArray(changes) ? changes : []; },
-  filtrarUsuariosPorSeguridad(usuarios) { return Array.isArray(usuarios) ? usuarios : []; },
-  filtrarPaisesPorSeguridad(paises) { return Array.isArray(paises) ? paises : []; },
-  filtrarBusinessServicesPorSeguridad(services) { return Array.isArray(services) ? services : []; },
-
-  login() {
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
-    sessionStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
-    
-    const loginDiv = document.getElementById('loginContainer');
-    const appDiv = document.getElementById('appContainer');
-    
-    if (loginDiv) loginDiv.style.display = 'none';
-    if (appDiv) {
-      appDiv.classList.remove('hidden');
-      appDiv.style.display = 'block';
+      if (resUsers.status === 'fulfilled' && resUsers.value.success) {
+        usuarios = resUsers.value.data;
+      }
+      if (resBS.status === 'fulfilled' && resBS.value.success) {
+        catalogoBusinessServices = resBS.value.data;
+      }
+    } catch (err) {
+      console.warn('[Auth] Fallback a datos locales temporales:', err);
     }
 
-    // Executa a montagem nativa da interface
-    this.executarRender();
-    return { success: true, user: adminGlobalUser };
-  },
-
-  logout() {
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.reload();
-  },
-
-  executarRender() {
-    setTimeout(() => {
-      if (typeof window.mostrarAppPrincipal === 'function') window.mostrarAppPrincipal();
-      if (typeof window.renderizarTodo === 'function') window.renderizarTodo();
-      if (typeof window.cargarDatos === 'function') window.cargarDatos();
-    }, 100);
-  },
-
-  inicializar() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    const loginDiv = document.getElementById('loginContainer');
-    const appDiv = document.getElementById('appContainer');
-
-    if (isLoggedIn) {
-      if (loginDiv) loginDiv.style.display = 'none';
-      if (appDiv) {
-        appDiv.classList.remove('hidden');
-        appDiv.style.display = 'block';
+    // Restaurar sesión activa
+    const sesionRaw = sessionStorage.getItem('nestle_sesion_activa_v7') || localStorage.getItem('nestle_sesion_activa_v7');
+    if (sesionRaw) {
+      try {
+        usuarioActual = JSON.parse(sesionRaw);
+      } catch (_) {
+        usuarioActual = null;
       }
-      this.executarRender();
-    } else {
-      if (loginDiv) loginDiv.style.display = 'flex';
-      if (appDiv) appDiv.classList.add('hidden');
     }
   }
-};
 
-window.authService = authService;
+  async function recargarUsuarios() {
+    try {
+      const res = await apiClient.getUsers();
+      if (res.success) usuarios = res.data;
+      return usuarios;
+    } catch (err) {
+      console.error('[Auth] Error recargando usuarios:', err);
+      return usuarios;
+    }
+  }
 
-document.addEventListener('DOMContentLoaded', () => {
-  authService.inicializar();
-});
+  async function recargarBusinessServices() {
+    try {
+      const res = await apiClient.getBusinessServices();
+      if (res.success) catalogoBusinessServices = res.data;
+      return catalogoBusinessServices;
+    } catch (err) {
+      console.error('[Auth] Error recargando Business Services:', err);
+      return catalogoBusinessServices;
+    }
+  }
+
+  async function login(usuario, password) {
+    try {
+      const res = await apiClient.login(usuario, password);
+      if (!res.success) {
+        return { exito: false, mensaje: res.error || 'Credenciales inválidas' };
+      }
+
+      if (res.requiereCambioPassword) {
+        return {
+          exito: false,
+          requiereCambioPassword: true,
+          usuarioId: res.usuarioId,
+          nombreUsuario: res.nombreUsuario
+        };
+      }
+
+      apiClient.setToken(res.token);
+      usuarioActual = res.usuario;
+      sessionStorage.setItem('nestle_sesion_activa_v7', JSON.stringify(usuarioActual));
+
+      return { exito: true, usuario: usuarioActual };
+    } catch (err) {
+      return { exito: false, mensaje: err.message || 'Error al conectar con el servidor' };
+    }
+  }
+
+  async function cambiarPassword(usuarioId, passwordActual, passwordNueva, primerAcceso = false) {
+    try {
+      const res = await apiClient.changePassword(usuarioId, passwordActual, passwordNueva);
+      if (res.success) {
+        if (primerAcceso) {
+          // Autologin tras cambio exitoso
+          const u = usuarios.find(x => x.id === usuarioId);
+          if (u) {
+            return await login(u.usuario, passwordNueva);
+          }
+        }
+        return { exito: true };
+      }
+      return { exito: false, mensaje: res.error || 'Error al cambiar contraseña' };
+    } catch (err) {
+      return { exito: false, mensaje: err.message || 'Error en servidor' };
+    }
+  }
+
+  async function crearUsuario(nuevoUsuario) {
+    try {
+      const res = await apiClient.createUser(nuevoUsuario);
+      if (res.success) {
+        await recargarUsuarios();
+        return { exito: true, id: res.id };
+      }
+      return { exito: false, mensaje: res.error };
+    } catch (err) {
+      return { exito: false, mensaje: err.message };
+    }
+  }
+
+  async function actualizarUsuario(id, datosActualizados) {
+    try {
+      const res = await apiClient.updateUser(id, datosActualizados);
+      if (res.success) {
+        await recargarUsuarios();
+        if (usuarioActual && usuarioActual.id === id) {
+          usuarioActual = { ...usuarioActual, ...datosActualizados };
+          sessionStorage.setItem('nestle_sesion_activa_v7', JSON.stringify(usuarioActual));
+        }
+        return { exito: true, usuario: usuarioActual };
+      }
+      return { exito: false, mensaje: res.error };
+    } catch (err) {
+      return { exito: false, mensaje: err.message };
+    }
+  }
+
+  async function eliminarUsuario(id) {
+    try {
+      const res = await apiClient.deleteUser(id);
+      if (res.success) {
+        await recargarUsuarios();
+        return { exito: true };
+      }
+      return { exito: false, mensaje: res.error };
+    } catch (err) {
+      return { exito: false, mensaje: err.message };
+    }
+  }
+
+  function cerrarSesionSinConfirmar() {
+    usuarioActual = null;
+    apiClient.setToken('');
+    sessionStorage.removeItem('nestle_sesion_activa_v7');
+    localStorage.removeItem('nestle_sesion_activa_v7');
+  }
+
+  function estaAutenticado() {
+    return usuarioActual !== null;
+  }
+
+  function obtenerUsuarioActual() {
+    return usuarioActual || {
+      id: 'usr-guest',
+      nombre: 'Invitado',
+      usuario: 'guest',
+      rol: ROLES.LECTURA,
+      businessServices: ['*'],
+      idioma: 'es'
+    };
+  }
+
+  function esAdminGlobal() {
+    return usuarioActual && usuarioActual.rol === ROLES.ADMIN;
+  }
+
+  function esAdminBS() {
+    return usuarioActual && (usuarioActual.rol === ROLES.ADMIN || usuarioActual.rol === ROLES.ADMIN_BS);
+  }
+
+  function puedeEditar() {
+    if (!usuarioActual) return false;
+    return usuarioActual.rol === ROLES.ADMIN || usuarioActual.rol === ROLES.ADMIN_BS || usuarioActual.rol === ROLES.EDICION;
+  }
+
+  function tieneAccesoBusinessService(bsNombre, pais = '') {
+    if (!usuarioActual) return false;
+    if (usuarioActual.rol === ROLES.ADMIN) return true;
+    const autorizados = usuarioActual.businessServices || [];
+    if (autorizados.includes('*')) return true;
+
+    const bsClean = (bsNombre || '').toLowerCase().trim();
+    return autorizados.some(item => {
+      const authClean = item.toLowerCase().trim();
+      return authClean === bsClean || bsClean.includes(authClean) || authClean.includes(bsClean);
+    });
+  }
+
+  function filtrarChangesPorSeguridad(changesList) {
+    if (!Array.isArray(changesList)) return [];
+    if (!usuarioActual || usuarioActual.rol === ROLES.ADMIN) return changesList;
+
+    const autorizados = usuarioActual.businessServices || [];
+    if (autorizados.includes('*')) return changesList;
+
+    return changesList.filter(ch => tieneAccesoBusinessService(ch.businessService, ch.pais));
+  }
+
+  return {
+    inicializar,
+    login,
+    cambiarPassword,
+    crearUsuario,
+    actualizarUsuario,
+    eliminarUsuario,
+    cerrarSesionSinConfirmar,
+    estaAutenticado,
+    obtenerUsuarioActual,
+    esAdminGlobal,
+    esAdminBS,
+    puedeEditar,
+    tieneAccesoBusinessService,
+    filtrarChangesPorSeguridad,
+    recargarUsuarios,
+    recargarBusinessServices,
+    get usuarios() { return usuarios; },
+    get catalogoBusinessServices() { return catalogoBusinessServices; }
+  };
+})();
