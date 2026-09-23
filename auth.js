@@ -1,4 +1,4 @@
-// Servicio de Autenticación Estable para Admin Global
+// Servico de Autenticacao Nativo e Permissao Admin Global
 const adminGlobalUser = {
   id: 1,
   username: 'admin',
@@ -48,24 +48,18 @@ const authService = {
     localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
     sessionStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
     
-    // Si la app está en la URL con hash #dashboard, lo limpiamos de la dirección
-    if (window.location.hash) {
-      window.history.replaceState(null, null, window.location.pathname);
-    }
-
-    // Ocultar pantalla de login y mostrar app principal
+    // Ocultar login e mostrar a aplicacao principal
     const loginDiv = document.getElementById('loginContainer');
     const appDiv = document.getElementById('appContainer');
     
-    if (loginDiv) loginDiv.classList.add('hidden');
-    if (appDiv) appDiv.classList.remove('hidden');
-
-    // Inicialización nativa de la interfaz
-    if (typeof window.inicializarApp === 'function') {
-      window.inicializarApp();
-    } else if (window.app && typeof window.app.init === 'function') {
-      window.app.init();
+    if (loginDiv) loginDiv.style.display = 'none';
+    if (appDiv) {
+      appDiv.classList.remove('hidden');
+      appDiv.style.display = 'block';
     }
+
+    // Dispara o evento de carregamento da DOM para o app.js renderizar a interface
+    document.dispatchEvent(new Event('DOMContentLoaded'));
     return { success: true, user: adminGlobalUser };
   },
 
@@ -77,10 +71,22 @@ const authService = {
 
   inicializar() {
     localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
+    localStorage.setItem('isLoggedIn', 'true');
   }
 };
 
 window.authService = authService;
+
+// Garante a visibilidade e sessao ao carregar a pagina
 document.addEventListener('DOMContentLoaded', () => {
   authService.inicializar();
+  const loginDiv = document.getElementById('loginContainer');
+  const appDiv = document.getElementById('appContainer');
+  if (localStorage.getItem('isLoggedIn') === 'true') {
+    if (loginDiv) loginDiv.style.display = 'none';
+    if (appDiv) {
+      appDiv.classList.remove('hidden');
+      appDiv.style.display = 'block';
+    }
+  }
 });
