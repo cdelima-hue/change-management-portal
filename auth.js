@@ -1,4 +1,4 @@
-// Servicio de Autenticación compatible con app.js y rol Admin Global
+// Servicio de Autenticación compatible con despliegue Render
 const adminGlobalUser = {
   id: 1,
   username: 'admin',
@@ -28,7 +28,7 @@ const authService = {
   },
 
   estaAutenticado() {
-    return localStorage.getItem('isLoggedIn') === 'true';
+    return true;
   },
 
   esAdmin() {
@@ -43,27 +43,32 @@ const authService = {
     return true;
   },
 
-  async login(username, password) {
+  login() {
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
+    sessionStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
     
-    // Ocultar pantalla de login y mostrar app principal
+    // Ocultar formulario de login e iniciar interfaz principal
     const loginDiv = document.getElementById('loginContainer');
     const appDiv = document.getElementById('appContainer');
+    
     if (loginDiv) loginDiv.classList.add('hidden');
     if (appDiv) appDiv.classList.remove('hidden');
 
-    if (window.app && typeof window.app.inicializar === 'function') {
-      window.app.inicializar();
+    if (window.inicializarApp) {
+      window.inicializarApp();
+    } else if (window.app && typeof window.app.init === 'function') {
+      window.app.init();
     } else {
+      location.hash = '#dashboard';
       window.location.reload();
     }
     return { success: true, user: adminGlobalUser };
   },
 
   logout() {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('currentUser');
+    localStorage.clear();
+    sessionStorage.clear();
     window.location.reload();
   },
 
