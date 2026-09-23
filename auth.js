@@ -1,9 +1,7 @@
 /**
  * auth.js – Módulo de Autenticación, Roles y Segregación de Business Services (v7.0 Production)
- * Conectado con la API REST y Base de Datos PostgreSQL / Backend.
  */
 
-// Roles disponibles
 const ROLES = {
   ADMIN: 'Administrador',
   ADMIN_BS: 'Administrador_BS',
@@ -12,7 +10,6 @@ const ROLES = {
 };
 
 const authService = (() => {
-  // Usuario Admin Global por defecto para garantizar acceso total de Administrador
   let usuarioActual = {
     id: 1,
     username: 'admin',
@@ -40,17 +37,12 @@ const authService = (() => {
         apiclient.getBusinessServices()
       ]);
 
-      if (resUsers.status === 'fulfilled' && resUsers.value.success) {
-        usuarios = resUsers.value.data;
-      }
-      if (resBS.status === 'fulfilled' && resBS.value.success) {
-        catalogoBusinessServices = resBS.value.data;
-      }
+      if (resUsers.status === 'fulfilled' && resUsers.value.success) usuarios = resUsers.value.data;
+      if (resBS.status === 'fulfilled' && resBS.value.success) catalogoBusinessServices = resBS.value.data;
     } catch (err) {
       console.warn('[Auth] Fallback a datos locales temporales:', err);
     }
 
-    // Mantener sesión activa con perfil de Administrador Global
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('currentUser', JSON.stringify(usuarioActual));
     sessionStorage.setItem('currentUser', JSON.stringify(usuarioActual));
@@ -72,83 +64,7 @@ const authService = (() => {
   function logout() {
     localStorage.clear();
     sessionStorage.clear();
-    window.location.reload();
-  }
-
-  function estaAutenticado() {
-    return true;
-  }
-
-  function obtenerUsuarioActual() {
-    return usuarioActual;
-  }
-
-  function getCurrentUser() {
-    return usuarioActual;
-  }
-
-  function esAdmin() {
-    return true;
-  }
-
-  function esAdminGlobal() {
-    return true;
-  }
-
-  function esAdminPais() {
-    return true;
-  }
-
-  function esAdminBS() {
-    return true;
-  }
-
-  function esEditor() {
-    return true;
-  }
-
-  function esLectura() {
-    return false;
-  }
-
-  function puedeEditar() {
-    return true;
-  }
-
-  function puedeCrear() {
-    return true;
-  }
-
-  function puedeEliminar() {
-    return true;
-  }
-
-  function puedeAprobar() {
-    return true;
-  }
-
-  function tienePermiso() {
-    return true;
-  }
-
-  function validarPermiso() {
-    return true;
-  }
-
-  function filtrarChangesPorSeguridad(changes) {
-    return Array.isArray(changes) ? changes : [];
-  }
-
-  function filtrarUsuariosPorSeguridad(listaUsuarios) {
-    return Array.isArray(listaUsuarios) ? listaUsuarios : [];
-  }
-
-  function filtrarPaisesPorSeguridad(paises) {
-    return Array.isArray(paises) ? paises : [];
-  }
-
-  function filtrarBusinessServicesPorSeguridad(services) {
-    return Array.isArray(services) ? services : [];
+    window.location.href = window.location.pathname;
   }
 
   return {
@@ -156,29 +72,32 @@ const authService = (() => {
     inicializar,
     login,
     logout,
-    estaAutenticado,
-    obtenerUsuarioActual,
-    getCurrentUser,
-    esAdmin,
-    esAdminGlobal,
-    esAdminPais,
-    esAdminBS,
-    esEditor,
-    esLectura,
-    puedeEditar,
-    puedeCrear,
-    puedeEliminar,
-    puedeAprobar,
-    tienePermiso,
-    validarPermiso,
-    filtrarChangesPorSeguridad,
-    filtrarUsuariosPorSeguridad,
-    filtrarPaisesPorSeguridad,
-    filtrarBusinessServicesPorSeguridad
+    estaAutenticado: () => true,
+    obtenerUsuarioActual: () => usuarioActual,
+    getCurrentUser: () => usuarioActual,
+    esAdmin: () => true,
+    esAdminGlobal: () => true,
+    esAdminPais: () => true,
+    esAdminBS: () => true,
+    esEditor: () => true,
+    esLectura: () => false,
+    puedeEditar: () => true,
+    puedeCrear: () => true,
+    puedeEliminar: () => true,
+    puedeAprobar: () => true,
+    tienePermiso: () => true,
+    validarPermiso: () => true,
+    filtrarChangesPorSeguridad: (changes) => Array.isArray(changes) ? changes : [],
+    filtrarUsuariosPorSeguridad: (lista) => Array.isArray(lista) ? lista : [],
+    filtrarPaisesPorSeguridad: (paises) => Array.isArray(paises) ? paises : [],
+    filtrarBusinessServicesPorSeguridad: (services) => Array.isArray(services) ? services : []
   };
 })();
 
+// Mapeamento global de funções para os botões do HTML/UI
 window.authService = authService;
+window.cerrarSesionApp = () => authService.logout();
+window.logout = () => authService.logout();
 
 document.addEventListener('DOMContentLoaded', () => {
   authService.inicializar();
