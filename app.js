@@ -1993,6 +1993,7 @@ async function salvarFormularioChange(event) {
         data.id=prev.id;
         if (typeof apiClient !== 'undefined') await apiClient.updateChange(prev.id, data);
         appState.changes[idx]={...prev,...data};
+        localStorage.setItem('nestle_changes_v4', JSON.stringify(appState.changes));
         mostrarToast(`Change ${data.numeroChange} actualizada en base de datos ✅`,'success');
       }
     } else {
@@ -2006,6 +2007,7 @@ async function salvarFormularioChange(event) {
         if (res && res.id) data.id = res.id;
       }
       appState.changes.unshift(data);
+      localStorage.setItem('nestle_changes_v4', JSON.stringify(appState.changes));
       mostrarToast(`Change ${data.numeroChange} creada y guardada en base de datos ✅`,'success');
     }
   } catch (err) {
