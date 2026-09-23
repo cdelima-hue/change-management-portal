@@ -13,7 +13,7 @@
 </head>
 <body class="p-2 sm:p-4 bg-slate-50 min-h-screen">
 
-  <!-- PANTALLA DE LOGIN (INTACTA - NO TOCAR) -->
+  <!-- PANTALLA DE LOGIN -->
   <div id="loginContainer" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 border border-slate-100">
       <div class="text-center mb-8">
@@ -100,47 +100,47 @@
       </div>
     </div>
 
-    <!-- Navegación de Pestañas (Tabs) con data-tab para el app.js -->
+    <!-- Navegación de Pestañas (Tabs) -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-2 flex flex-wrap items-center justify-between gap-2">
       <div class="flex flex-wrap items-center gap-1" id="mainNavTabs">
-        <button id="tab-kanban" data-tab="kanban" class="tab-btn active px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white transition">
+        <button onclick="window.trocarAba('kanban', this)" class="btn-aba active px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white transition">
           <i class="fa-solid fa-columns mr-1.5"></i> Kanban
         </button>
-        <button id="tab-matriz" data-tab="matriz" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+        <button onclick="window.trocarAba('matriz', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
           <i class="fa-solid fa-table-cells mr-1.5"></i> Matriz
         </button>
-        <button id="tab-dashboard" data-tab="dashboard" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+        <button onclick="window.trocarAba('dashboard', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
           <i class="fa-solid fa-chart-pie mr-1.5"></i> Dashboard
         </button>
-        <button id="tab-reportes" data-tab="reportes" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+        <button onclick="window.trocarAba('reportes', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
           <i class="fa-solid fa-chart-line mr-1.5"></i> Reportes & SLA
         </button>
-        <button id="tab-backlog" data-tab="backlog" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+        <button onclick="window.trocarAba('backlog', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
           <i class="fa-solid fa-list-check mr-1.5"></i> Backlog
         </button>
-        <button id="tab-historial" data-tab="historial" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+        <button onclick="window.trocarAba('historial', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-100 transition">
           <i class="fa-solid fa-clock-rotate-left mr-1.5"></i> Historial
         </button>
 
-        <button id="tab-paises" data-tab="paises" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
+        <button onclick="window.trocarAba('paises', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
           <i class="fa-solid fa-earth-americas mr-1.5 text-blue-600"></i> Países
         </button>
-        <button id="tab-usuarios" data-tab="usuarios" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
+        <button onclick="window.trocarAba('usuarios', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
           <i class="fa-solid fa-users mr-1.5 text-blue-600"></i> Usuarios
         </button>
-        <button id="tab-logo" data-tab="logo" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
+        <button onclick="window.trocarAba('logo', this)" class="btn-aba px-4 py-2 text-xs font-bold rounded-xl text-slate-700 hover:bg-slate-100 transition">
           <i class="fa-solid fa-image mr-1.5 text-blue-600"></i> Logo & Marca
         </button>
       </div>
 
       <div>
-        <button id="btnNuevoChange" class="px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 transition">
+        <button id="btnNuevoChange" onclick="window.abrirModalNuevo()" class="px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 transition">
           <i class="fa-solid fa-plus mr-1"></i> + Change
         </button>
       </div>
     </div>
 
-    <!-- Contentor Único e Universal onde o app.js renderiza TUDO -->
+    <!-- Contentores Únicos para Rendering -->
     <main id="tabContent" class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm min-h-[500px]">
       <div id="kanbanBoard" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
       <div id="matrizView" class="hidden"></div>
@@ -160,27 +160,33 @@
   <div id="modalPerfil" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
   <div id="modalCambiarPassVoluntario" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
 
-  <!-- Script Auxiliar para garantir a troca visual de abas nativa -->
+  <!-- Script de ligacao direta de abas ao app.js -->
   <script>
-    document.addEventListener('click', function(e) {
-      const btn = e.target.closest('.tab-btn');
-      if (!btn) return;
-      
-      const tabName = btn.getAttribute('data-tab');
-      if (!tabName) return;
-
-      // Destacar o botão ativo
-      document.querySelectorAll('.tab-btn').forEach(b => {
+    window.trocarAba = function(nomeAba, elemento) {
+      document.querySelectorAll('.btn-aba').forEach(b => {
         b.classList.remove('bg-blue-600', 'text-white', 'active');
         b.classList.add('text-slate-600');
       });
-      btn.classList.add('bg-blue-600', 'text-white', 'active');
-      btn.classList.remove('text-slate-600');
+      if (elemento) {
+        elemento.classList.add('bg-blue-600', 'text-white', 'active');
+        elemento.classList.remove('text-slate-600');
+      }
 
-      // Chamar as funções de renderização do app.js se existirem
-      if (window.cambiarTab) window.cambiarTab(tabName);
-      if (window.renderTabContent) window.renderTabContent(tabName);
-    });
+      if (typeof window.cambiarTab === 'function') window.cambiarTab(nomeAba);
+      if (typeof window.renderTabContent === 'function') window.renderTabContent(nomeAba);
+      if (typeof window.renderizarTodo === 'function') window.renderizarTodo();
+    };
+
+    window.abrirModalNuevo = function() {
+      if (typeof window.abrirModalNuevoChange === 'function') {
+        window.abrirModalNuevoChange();
+      } else if (typeof window.abrirModalChange === 'function') {
+        window.abrirModalChange();
+      } else {
+        const m = document.getElementById('modalChange');
+        if (m) m.classList.remove('hidden');
+      }
+    };
   </script>
 
   <!-- SCRIPTS NATIVOS -->
