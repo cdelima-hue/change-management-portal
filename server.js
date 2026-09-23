@@ -6,85 +6,58 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Inicializar base de datos
+// Inicializar base de dados
 db.initDb().catch(console.error);
 
-// Función para manejar el login con Permiso Total de Administrador Global
-const handleLogin = async (req, res) => {
-  const { username } = req.body || {};
-  try {
-    const { rows } = await db.query('SELECT * FROM users WHERE username = $1', [username || 'admin']);
-    
-    const userObj = rows.length > 0 ? rows[0] : {
-      id: 1,
-      username: username || 'admin',
-      nombre: 'Claudio Lima',
-      role: 'Admin Global',
-      pais: null,
-      business_services: []
-    };
-
-    const userData = {
-      id: userObj.id,
-      username: userObj.username,
-      nombre: 'Claudio Lima',
-      usuario: 'Claudio Lima',
-      role: 'Admin Global',
-      rol: 'Admin Global',
-      esAdmin: true,
-      isAdmin: true,
-      pais: null,
-      business_services: []
-    };
-
-    res.json({
-      success: true,
-      token: 'token-demo-production-2026',
-      user: userData,
-      usuario: userData
-    });
-  } catch (err) {
-    console.error('Error en el login:', err);
-    const fallbackUser = {
-      id: 1,
-      username: 'admin',
-      nombre: 'Claudio Lima',
-      usuario: 'Claudio Lima',
-      role: 'Admin Global',
-      rol: 'Admin Global',
-      esAdmin: true,
-      isAdmin: true
-    };
-    res.json({
-      success: true,
-      token: 'token-demo-fallback',
-      user: fallbackUser,
-      usuario: fallbackUser
-    });
-  }
+// Objeto com permissao total de Administrador Global
+const adminGlobalUser = {
+  id: 1,
+  username: 'admin',
+  nombre: 'Claudio Lima',
+  usuario: 'Claudio Lima',
+  role: 'Admin Global',
+  rol: 'Admin Global',
+  role_id: 'admin',
+  type: 'admin',
+  esAdmin: true,
+  isAdmin: true,
+  activo: true,
+  pais: null,
+  business_services: []
 };
 
-// Rutas de Autenticación
+// Funcao para tratar o Login garantindo Administrador Global
+const handleLogin = async (req, res) => {
+  res.json({
+    success: true,
+    status: 'success',
+    token: 'token-demo-production-2026',
+    user: adminGlobalUser,
+    usuario: adminGlobalUser,
+    data: adminGlobalUser
+  });
+};
+
+// Rotas de Autenticacao
 app.post('/api/login', handleLogin);
 app.post('/api/auth/login', handleLogin);
 app.post('/login', handleLogin);
 
-// Usuarios
+// Utilizadores
 app.get('/api/users', async (req, res) => {
-  try {
-    const { rows } = await db.query('SELECT id, username, nombre, role, pais, business_services FROM users ORDER BY nombre ASC');
-    res.json(rows);
-  } catch (err) {
-    res.json([]);
-  }
+  res.json([adminGlobalUser]);
 });
 
-// Configuración y Registros
+app.get('/api/users/current', (req, res) => {
+  res.json(adminGlobalUser);
+});
+
+// Settings & Configs
 app.get('/api/settings/report_presets', (req, res) => res.json([]));
 app.get('/api/settings/custom_logo', (req, res) => res.json({ logo: null }));
 app.get('/api/audit-logs', (req, res) => res.json([]));
 
-// Países
+// Paises
 app.get('/api/countries', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM countries ORDER BY nombre ASC');
@@ -148,7 +121,7 @@ app.delete('/api/business-services/:id', async (req, res) => {
   }
 });
 
-// Productos
+// Produtos
 app.get('/api/products', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM products ORDER BY nombre ASC');
@@ -180,7 +153,7 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-// Changes (Solicitudes)
+// Changes (Solicitacoes)
 app.get('/api/changes', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM changes ORDER BY id DESC');
@@ -232,12 +205,12 @@ app.delete('/api/changes/:id', async (req, res) => {
   }
 });
 
-// Fallback para la aplicación web (SPA)
+// Fallback SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor ejecutándose en el puerto ${PORT}`);
+  console.log(`🚀 Servidor a rodar na porta ${PORT}`);
 });
