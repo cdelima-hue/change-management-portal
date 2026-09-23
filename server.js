@@ -6,17 +6,18 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Inicializar base de dados
+// Inicializar base de datos PostgreSQL
 db.initDb().catch(console.error);
 
-// Objeto com permissao total de Administrador Global
-const adminGlobalUser = {
+// Perfil de Administrador Global con todas las propiedades posibles
+const adminUser = {
   id: 1,
   username: 'admin',
   nombre: 'Claudio Lima',
   usuario: 'Claudio Lima',
   role: 'Admin Global',
   rol: 'Admin Global',
+  perfil: 'Admin Global',
   role_id: 'admin',
   type: 'admin',
   esAdmin: true,
@@ -26,38 +27,42 @@ const adminGlobalUser = {
   business_services: []
 };
 
-// Funcao para tratar o Login garantindo Administrador Global
+// Manejador de Login que otorga acceso Total
 const handleLogin = async (req, res) => {
   res.json({
     success: true,
     status: 'success',
     token: 'token-demo-production-2026',
-    user: adminGlobalUser,
-    usuario: adminGlobalUser,
-    data: adminGlobalUser
+    user: adminUser,
+    usuario: adminUser,
+    data: adminUser
   });
 };
 
-// Rotas de Autenticacao
+// Rutas de Autenticación
 app.post('/api/login', handleLogin);
 app.post('/api/auth/login', handleLogin);
 app.post('/login', handleLogin);
 
-// Utilizadores
+// Rutas de Usuarios y Perfil Actual
 app.get('/api/users', async (req, res) => {
-  res.json([adminGlobalUser]);
+  res.json([adminUser]);
 });
 
 app.get('/api/users/current', (req, res) => {
-  res.json(adminGlobalUser);
+  res.json(adminUser);
 });
 
-// Settings & Configs
+app.get('/api/me', (req, res) => {
+  res.json(adminUser);
+});
+
+// Configuración y Registros requeridos por la interfaz
 app.get('/api/settings/report_presets', (req, res) => res.json([]));
 app.get('/api/settings/custom_logo', (req, res) => res.json({ logo: null }));
 app.get('/api/audit-logs', (req, res) => res.json([]));
 
-// Paises
+// Países
 app.get('/api/countries', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM countries ORDER BY nombre ASC');
@@ -121,7 +126,7 @@ app.delete('/api/business-services/:id', async (req, res) => {
   }
 });
 
-// Produtos
+// Productos
 app.get('/api/products', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM products ORDER BY nombre ASC');
@@ -153,7 +158,7 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-// Changes (Solicitacoes)
+// Changes (Solicitudes)
 app.get('/api/changes', async (req, res) => {
   try {
     const { rows } = await db.query('SELECT * FROM changes ORDER BY id DESC');
@@ -205,12 +210,12 @@ app.delete('/api/changes/:id', async (req, res) => {
   }
 });
 
-// Fallback SPA
+// Fallback para SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor a rodar na porta ${PORT}`);
+  console.log(`🚀 Servidor ejecutándose en el puerto ${PORT}`);
 });
