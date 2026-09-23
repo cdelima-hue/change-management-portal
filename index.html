@@ -11,12 +11,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Dummies de seguranca para evitar erros no Console -->
+  <!-- Dummies de seguranca com inicializar() implementado -->
   <script>
     window.brandingService = {
-      cargarLogo: function() {},
+      cargarLogo: function() { return Promise.resolve(); },
       aplicarLogo: function() {},
-      init: function() {}
+      init: function() { return Promise.resolve(); },
+      inicializar: function() { return Promise.resolve(); }
     };
     window.apiClient = {
       get: async function() { return []; },
