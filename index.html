@@ -10,28 +10,6 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
-
-  <script>
-    // Garantir perfil Admin Global antes de carregar a aplicacao
-    (function() {
-      const adminUser = {
-        id: 1,
-        username: 'admin',
-        nombre: 'Claudio Lima',
-        usuario: 'Claudio Lima',
-        role: 'Admin Global',
-        rol: 'Admin Global',
-        perfil: 'Admin Global',
-        esAdmin: true,
-        isAdmin: true,
-        activo: true,
-        pais: null,
-        business_services: []
-      };
-      localStorage.setItem('currentUser', JSON.stringify(adminUser));
-      sessionStorage.setItem('currentUser', JSON.stringify(adminUser));
-    })();
-  </script>
 </head>
 <body class="p-2 sm:p-4 bg-slate-50 min-h-screen">
 
@@ -64,7 +42,7 @@
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="appContainer" class="hidden"></div>
 
-  <!-- MODAL RECONFIGURADO • CHANGE (5 CAMPOS OBLIGATORIOS) -->
+  <!-- MODAL RECONFIGURADO • CHANGE -->
   <div id="modalChange" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-3 z-50"></div>
 
   <!-- MODAL CAMBIO OBLIGATORIO DE CONTRASEÑA -->
