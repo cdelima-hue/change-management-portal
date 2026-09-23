@@ -10,27 +10,6 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
-
-  <script>
-    // Inicialización previa del perfil como Admin Global
-    const adminSession = {
-      id: 1,
-      username: 'admin',
-      nombre: 'Claudio Lima',
-      usuario: 'Claudio Lima',
-      role: 'Admin Global',
-      rol: 'Admin Global',
-      perfil: 'Admin Global',
-      esAdmin: true,
-      isAdmin: true,
-      activo: true,
-      pais: null,
-      business_services: []
-    };
-    localStorage.setItem('currentUser', JSON.stringify(adminSession));
-    localStorage.setItem('user', JSON.stringify(adminSession));
-    sessionStorage.setItem('currentUser', JSON.stringify(adminSession));
-  </script>
 </head>
 <body class="p-2 sm:p-4 bg-slate-50 min-h-screen">
 
@@ -62,7 +41,6 @@
 
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="appContainer" class="hidden max-w-[1800px] mx-auto space-y-4">
-    <!-- Header principal -->
     <header class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md shadow-blue-500/20">
@@ -82,7 +60,6 @@
       </div>
 
       <div class="flex items-center gap-3">
-        <!-- Selector de usuario arriba a la derecha -->
         <div class="relative group">
           <button id="userMenuBtn" class="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200/80 rounded-xl text-xs font-bold text-slate-700 transition">
             <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs">C</div>
@@ -93,15 +70,11 @@
       </div>
     </header>
 
-    <!-- Panel Dashboard / Tabs -->
     <main class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 min-h-[600px]">
-      <div id="tabContent">
-        <!-- El contenido dinámico de app.js se renderiza aquí -->
-      </div>
+      <div id="tabContent"></div>
     </main>
   </div>
 
-  <script src="db.js"></script>
   <script src="auth.js"></script>
   <script src="app.js"></script>
 </body>
