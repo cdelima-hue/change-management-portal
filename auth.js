@@ -1,4 +1,4 @@
-// Manejador de Autenticación Definitivo para Admin Global
+// Servico de Autenticacao com Perfil de Administrador Global NATIVO
 const adminGlobalUser = {
   id: 1,
   username: 'admin',
@@ -17,8 +17,6 @@ const adminGlobalUser = {
 };
 
 const authService = {
-  usuarioActual: adminGlobalUser,
-
   getCurrentUser() {
     return adminGlobalUser;
   },
@@ -28,7 +26,7 @@ const authService = {
   },
 
   estaAutenticado() {
-    return true;
+    return localStorage.getItem('isLoggedIn') === 'true';
   },
 
   esAdmin() {
@@ -44,20 +42,21 @@ const authService = {
   },
 
   async login(username, password) {
+    localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
-    sessionStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
     return { success: true, user: adminGlobalUser };
   },
 
   logout() {
+    localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('currentUser');
-    sessionStorage.removeItem('currentUser');
     window.location.reload();
   },
 
   inicializar() {
-    localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
-    sessionStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
+    if (!localStorage.getItem('currentUser')) {
+      localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
+    }
   }
 };
 
