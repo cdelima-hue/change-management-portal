@@ -1,4 +1,3 @@
-// Manejador de Autenticación de Frontend con Permiso Admin Global
 const authService = {
   getCurrentUser() {
     return {
@@ -37,6 +36,3 @@ const authService = {
 };
 
 window.authService = authService;
-document.addEventListener('DOMContentLoaded', () => {
-  authService.inicializar();
-});
