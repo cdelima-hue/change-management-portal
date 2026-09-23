@@ -1,4 +1,4 @@
-// Servico de Autenticacao Nativo e Permissao Admin Global
+// Servicio de Autenticación Completo para Admin Global
 const adminGlobalUser = {
   id: 1,
   username: 'admin',
@@ -39,6 +39,22 @@ const authService = {
     return true;
   },
 
+  puedeEditar() {
+    return true;
+  },
+
+  puedeCrear() {
+    return true;
+  },
+
+  puedeEliminar() {
+    return true;
+  },
+
+  puedeAprobar() {
+    return true;
+  },
+
   tienePermiso() {
     return true;
   },
@@ -48,7 +64,6 @@ const authService = {
     localStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
     sessionStorage.setItem('currentUser', JSON.stringify(adminGlobalUser));
     
-    // Ocultar login e mostrar a aplicacao principal
     const loginDiv = document.getElementById('loginContainer');
     const appDiv = document.getElementById('appContainer');
     
@@ -58,8 +73,13 @@ const authService = {
       appDiv.style.display = 'block';
     }
 
-    // Dispara o evento de carregamento da DOM para o app.js renderizar a interface
-    document.dispatchEvent(new Event('DOMContentLoaded'));
+    if (typeof window.mostrarAppPrincipal === 'function') {
+      window.mostrarAppPrincipal();
+    } else if (typeof window.inicializarApp === 'function') {
+      window.inicializarApp();
+    } else {
+      window.location.reload();
+    }
     return { success: true, user: adminGlobalUser };
   },
 
@@ -77,16 +97,6 @@ const authService = {
 
 window.authService = authService;
 
-// Garante a visibilidade e sessao ao carregar a pagina
 document.addEventListener('DOMContentLoaded', () => {
   authService.inicializar();
-  const loginDiv = document.getElementById('loginContainer');
-  const appDiv = document.getElementById('appContainer');
-  if (localStorage.getItem('isLoggedIn') === 'true') {
-    if (loginDiv) loginDiv.style.display = 'none';
-    if (appDiv) {
-      appDiv.classList.remove('hidden');
-      appDiv.style.display = 'block';
-    }
-  }
 });
