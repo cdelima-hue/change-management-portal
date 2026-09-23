@@ -1951,6 +1951,7 @@ async function salvarFormularioChange(event) {
     solicitante,
     pais,
     businessService,
+    business_service: businessService,
     producto: gv('inpProduto') || 'General',
     descripcion: shortDescription,
     titulo: shortDescription,
