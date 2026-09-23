@@ -35,14 +35,15 @@ const authService = (() => {
     }
 
     // Restaurar sesión activa
-    const sesionRaw = sessionStorage.getItem('nestle_sesion_activa_v7') || localStorage.getItem('nestle_sesion_activa_v7');
-    if (sesionRaw) {
-      try {
-        usuarioActual = JSON.parse(sesionRaw);
-      } catch (_) {
-        usuarioActual = null;
-      }
-    }
+    // Forçar perfil de Administrador Global
+if (!usuarioActual) {
+  usuarioActual = { id: 1, username: 'admin', nombre: 'Claudio Lima' };
+}
+usuarioActual.role = ROLES.ADMIN;
+usuarioActual.rol = ROLES.ADMIN;
+usuarioActual.perfil = 'Admin Global';
+usuarioActual.esAdmin = true;
+usuarioActual.isAdmin = true;
   }
 
   async function recargarUsuarios() {
