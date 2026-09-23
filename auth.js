@@ -1,4 +1,4 @@
-// Servicio de Autenticación Completo para Admin Global
+// Servicio de Autenticación Universal para Admin Global
 const adminGlobalUser = {
   id: 1,
   username: 'admin',
@@ -19,45 +19,23 @@ const adminGlobalUser = {
 const authService = {
   usuarioActual: adminGlobalUser,
 
-  getCurrentUser() {
-    return adminGlobalUser;
-  },
+  getCurrentUser() { return adminGlobalUser; },
+  obtenerUsuarioActual() { return adminGlobalUser; },
+  estaAutenticado() { return true; },
 
-  obtenerUsuarioActual() {
-    return adminGlobalUser;
-  },
-
-  estaAutenticado() {
-    return true;
-  },
-
-  esAdmin() {
-    return true;
-  },
-
-  esAdminGlobal() {
-    return true;
-  },
-
-  puedeEditar() {
-    return true;
-  },
-
-  puedeCrear() {
-    return true;
-  },
-
-  puedeEliminar() {
-    return true;
-  },
-
-  puedeAprobar() {
-    return true;
-  },
-
-  tienePermiso() {
-    return true;
-  },
+  // Métodos de Validación de Roles y Permisos completos
+  esAdmin() { return true; },
+  esAdminGlobal() { return true; },
+  esAdminPais() { return true; },
+  esAdminBS() { return true; },
+  esEditor() { return true; },
+  esLectura() { return false; },
+  puedeEditar() { return true; },
+  puedeCrear() { return true; },
+  puedeEliminar() { return true; },
+  puedeAprobar() { return true; },
+  tienePermiso() { return true; },
+  validarPermiso() { return true; },
 
   login() {
     localStorage.setItem('isLoggedIn', 'true');
