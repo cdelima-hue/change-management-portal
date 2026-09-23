@@ -6,15 +6,15 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Inicializar base de datos PostgreSQL
+// Inicializar base de datos
 db.initDb().catch(console.error);
 
-// Perfil de Administrador Global con todas las propiedades posibles
-const adminUser = {
-  id: 1,
-  username: 'admin',
-  nombre: 'Claudio Lima',
-  usuario: 'Claudio Lima',
+// Objeto de Super Administrador Global
+const superAdminUser = {
+  id: 99,
+  username: 'superadmin',
+  nombre: 'Claudio Lima (SuperAdmin)',
+  usuario: 'Claudio Lima (SuperAdmin)',
   role: 'Admin Global',
   rol: 'Admin Global',
   perfil: 'Admin Global',
@@ -27,15 +27,15 @@ const adminUser = {
   business_services: []
 };
 
-// Manejador de Login que otorga acceso Total
+// Manejador de Login que devuelve SIEMPRE SuperAdmin Global
 const handleLogin = async (req, res) => {
   res.json({
     success: true,
     status: 'success',
-    token: 'token-demo-production-2026',
-    user: adminUser,
-    usuario: adminUser,
-    data: adminUser
+    token: 'token-superadmin-2026',
+    user: superAdminUser,
+    usuario: superAdminUser,
+    data: superAdminUser
   });
 };
 
@@ -46,18 +46,18 @@ app.post('/login', handleLogin);
 
 // Rutas de Usuarios y Perfil Actual
 app.get('/api/users', async (req, res) => {
-  res.json([adminUser]);
+  res.json([superAdminUser]);
 });
 
 app.get('/api/users/current', (req, res) => {
-  res.json(adminUser);
+  res.json(superAdminUser);
 });
 
 app.get('/api/me', (req, res) => {
-  res.json(adminUser);
+  res.json(superAdminUser);
 });
 
-// Configuración y Registros requeridos por la interfaz
+// Configuración y Registros
 app.get('/api/settings/report_presets', (req, res) => res.json([]));
 app.get('/api/settings/custom_logo', (req, res) => res.json({ logo: null }));
 app.get('/api/audit-logs', (req, res) => res.json([]));
@@ -210,7 +210,7 @@ app.delete('/api/changes/:id', async (req, res) => {
   }
 });
 
-// Fallback para SPA
+// Fallback SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
