@@ -1765,8 +1765,10 @@ async function onTogglePaisActivo(key, activo) {
 async function onEliminarPais(key) {
   if (!authService.esAdminGlobal()) { mostrarToast(t('toast.solo_admin'), 'warning'); return; }
   await handleEliminarPais(key);
+  renderizarConfigPaises();
+  poblarFiltroPaises();
+  poblarSelectPaisFormulario();
 }
-
 async function onAgregarPais() {
   if (!authService.esAdminGlobal()) { mostrarToast(t('toast.solo_admin'), 'warning'); return; }
   const nombre = document.getElementById('inpNuevoPaisNombre')?.value?.trim();
