@@ -21,9 +21,7 @@
         <p class="text-slate-500 text-sm mt-1">Inicia sesión para acceder al sistema de gestión y capacidad</p>
       </div>
 
-      <div id="loginError" class="hidden mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200"></div>
-
-      <form id="loginForm" onsubmit="event.preventDefault(); authService.login();">
+      <form id="loginForm" onsubmit="event.preventDefault(); document.getElementById('loginContainer').classList.add('hidden'); document.getElementById('appContainer').classList.remove('hidden');">
         <div class="mb-4">
           <label class="block text-xs font-bold text-slate-700 mb-1">Usuario o Correo Electrónico</label>
           <input type="text" id="loginUsername" value="admin" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
@@ -37,26 +35,141 @@
         </button>
       </form>
       
-      <!-- Botões de Acesso Rápido Demostrativo -->
       <div class="mt-6 pt-6 border-t border-slate-100 text-center">
         <p class="text-xs text-slate-400 font-semibold mb-3">Credenciales de demostración rápida:</p>
         <div class="grid grid-cols-3 gap-2">
-          <button onclick="authService.login();" class="p-2 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700">Admin Global</button>
-          <button onclick="authService.login();" class="p-2 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700">México</button>
-          <button onclick="authService.login();" class="p-2 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700">Brasil</button>
+          <button onclick="document.getElementById('loginContainer').classList.add('hidden'); document.getElementById('appContainer').classList.remove('hidden');" class="p-2 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700">Admin Global</button>
+          <button onclick="document.getElementById('loginContainer').classList.add('hidden'); document.getElementById('appContainer').classList.remove('hidden');" class="p-2 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700">México</button>
+          <button onclick="document.getElementById('loginContainer').classList.add('hidden'); document.getElementById('appContainer').classList.remove('hidden');" class="p-2 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700">Brasil</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- APLICACIÓN PRINCIPAL -->
-  <div id="appContainer" class="hidden"></div>
+  <div id="appContainer">
+    <!-- HEADER -->
+    <header class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mb-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-blue-600 rounded-xl text-white">
+          <i class="fas fa-sitemap text-xl"></i>
+        </div>
+        <div>
+          <h1 class="font-black text-slate-800 text-lg flex items-center gap-2">
+            Portal Gestión de Changes
+            <span class="text-xs font-semibold px-2 py-0.5 bg-blue-50 text-blue-600 rounded-md">v6.0 Enterprise</span>
+          </h1>
+          <p class="text-xs text-slate-400 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1 text-emerald-600 font-medium"><i class="fas fa-circle text-[8px]"></i> Online</span>
+            • Regla global: máx. 30h por Change • Control de Roles & SLA
+          </p>
+        </div>
+      </div>
 
-  <!-- MODALES DA APLICAÇÃO -->
-  <div id="modalChange" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-3 z-50"></div>
-  <div id="modalPrimerAcceso" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
-  <div id="modalPerfil" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
-  <div id="modalCambiarPassVoluntario" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50"></div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <button onclick="window.location.reload()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-2">
+          <i class="fas fa-sync-alt"></i> Sync
+        </button>
+        <button onclick="window.location.reload()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2">
+          <i class="fas fa-file-excel"></i> Exportar
+        </button>
+        <button onclick="alert('Formulario de nueva Change')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-blue-500/20">
+          <i class="fas fa-plus"></i> + Change
+        </button>
+        
+        <!-- MENU DO UTILIZADOR -->
+        <div class="relative ml-2">
+          <button onclick="document.getElementById('userDropdown').classList.toggle('hidden')" class="flex items-center gap-2 p-1.5 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200">
+            <div class="w-8 h-8 rounded-lg bg-blue-600 text-white font-black flex items-center justify-center text-xs">C</div>
+            <div class="text-left hidden sm:block">
+              <p class="text-xs font-bold text-slate-800 leading-none">Claudio Lima (SuperAdmin)</p>
+
+            </div>
+            <i class="fas fa-chevron-down text-xs text-slate-400 mr-1"></i>
+          </button>
+          
+          <div id="userDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-slate-100 p-2 z-50">
+            <div class="p-2 border-b border-slate-100">
+              <p class="text-xs font-bold text-slate-800">Claudio Lima (SuperAdmin)</p>
+              <span class="inline-block mt-1 text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">Admin Global</span>
+            </div>
+            <button onclick="window.cerrarSesionApp()" class="w-full mt-1 text-left px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2">
+              <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- BARRA DE SELEÇÃO DE VISTAS (ABAS) -->
+    <div class="bg-white rounded-2xl p-2 shadow-sm border border-slate-100 mb-4 flex items-center justify-between gap-2 overflow-x-auto">
+      <div class="flex items-center gap-1">
+        <button onclick="cambiarTab('tabKanban')" class="nav-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-50 text-blue-600 flex items-center gap-2">
+          <i class="fas fa-columns"></i> Kanban
+        </button>
+        <button onclick="cambiarTab('tabPaises')" class="nav-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 flex items-center gap-2">
+          <i class="fas fa-globe"></i> Países
+        </button>
+        <button onclick="cambiarTab('tabUsuarios')" class="nav-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 flex items-center gap-2">
+          <i class="fas fa-users"></i> Usuarios
+        </button>
+      </div>
+    </div>
+
+    <!-- ABA 1: KANBAN -->
+    <div id="tabKanban" class="tab-content">
+      <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-8 gap-3 overflow-x-auto pb-4">
+        <div class="bg-slate-100/70 p-3 rounded-2xl border border-slate-200/60 min-w-[200px]">
+          <div class="flex items-center justify-between mb-3"><span class="text-xs font-black text-slate-700 uppercase">1. ABERTURA</span><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 text-[10px] font-bold flex items-center justify-center">0</span></div>
+        </div>
+        <div class="bg-slate-100/70 p-3 rounded-2xl border border-slate-200/60 min-w-[200px]">
+          <div class="flex items-center justify-between mb-3"><span class="text-xs font-black text-slate-700 uppercase">2. REUNIÃO</span><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 text-[10px] font-bold flex items-center justify-center">0</span></div>
+        </div>
+        <div class="bg-slate-100/70 p-3 rounded-2xl border border-slate-200/60 min-w-[200px]">
+          <div class="flex items-center justify-between mb-3"><span class="text-xs font-black text-slate-700 uppercase">3. ANÁLISE</span><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 text-[10px] font-bold flex items-center justify-center">0</span></div>
+        </div>
+        <div class="bg-slate-100/70 p-3 rounded-2xl border border-slate-200/60 min-w-[200px]">
+          <div class="flex items-center justify-between mb-3"><span class="text-xs font-black text-slate-700 uppercase">4. COMITÊ</span><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 text-[10px] font-bold flex items-center justify-center">0</span></div>
+        </div>
+        <div class="bg-slate-100/70 p-3 rounded-2xl border border-slate-200/60 min-w-[200px]">
+          <div class="flex items-center justify-between mb-3"><span class="text-xs font-black text-blue-700 uppercase">5. APRESENTAÇÃO</span><span class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-[10px] font-bold flex items-center justify-center">0</span></div>
+        </div>
+        <div class="bg-emerald-50/50 p-3 rounded-2xl border border-emerald-100 min-w-[200px]">
+          <div class="flex items-center justify-between mb-3"><span class="text-xs font-black text-emerald-700 uppercase">6. APROVAÇÃO</span><span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 text-[10px] font-bold flex items-center justify-center">0</span></div>
+        </div>
+        <div class="bg-blue-50/50 p-3 rounded-2xl border border-blue-100 min-w-[200px]">
+          <div class="flex items-center justify-between mb-3"><span class="text-xs font-black text-blue-700 uppercase">7. EXECUÇÃO</span><span class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-[10px] font-bold flex items-center justify-center">0</span></div>
+        </div>
+        <div class="bg-emerald-100/40 p-3 rounded-2xl border border-emerald-200 min-w-[200px]">
+          <div class="flex items-center justify-between mb-3"><span class="text-xs font-black text-emerald-800 uppercase">8. CONCLUÍDA</span><span class="w-5 h-5 rounded-full bg-emerald-200 text-emerald-700 text-[10px] font-bold flex items-center justify-center">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 2: PAÍSES -->
+    <div id="tabPaises" class="tab-content hidden bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">Gestión de Países y Horas Mensuales</h2>
+      <table class="w-full text-left border-collapse" id="paisesTable">
+        <thead>
+          <tr class="border-b border-slate-200 text-xs font-bold text-slate-500 uppercase">
+            <th class="py-3 px-4">País</th>
+            <th class="py-3 px-4">Horas Mensuales</th>
+            <th class="py-3 px-4">Máx. Por Change</th>
+            <th class="py-3 px-4">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaPaisesBody">
+          <!-- Gerado dinamicamente -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ABA 3: USUÁRIOS -->
+    <div id="tabUsuarios" class="tab-content hidden bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">Gestión de Usuarios</h2>
+      <p class="text-sm text-slate-500">Módulo de administración de accesos y permisos por Business Service.</p>
+    </div>
+  </div>
 
   <!-- SCRIPTS NATIVOS DA APLICAÇÃO -->
   <script src="api.js"></script>
