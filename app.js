@@ -2369,3 +2369,31 @@ async function agregarBSDesdeTab() {
     if (typeof mostrarToast === 'function') mostrarToast('Este Business Service já existe.', 'warning');
   }
 }
+// Função para Editar nome do Business Service
+async function editarBS(nomeAntigo) {
+  const novoNome = prompt('Editar Business Service:', nomeAntigo);
+  if (!novoNome || novoNome.trim() === '' || novoNome.trim() === nomeAntigo) return;
+
+  const idx = BUSINESS_SERVICES.indexOf(nomeAntigo);
+  if (idx !== -1) {
+    BUSINESS_SERVICES[idx] = novoNome.trim();
+    localStorage.setItem('nestle_bs_v4', JSON.stringify(BUSINESS_SERVICES));
+    if (typeof renderizarListasBSYProductos === 'function') renderizarListasBSYProductos();
+    if (typeof poblarSelects === 'function') poblarSelects();
+    if (typeof mostrarToast === 'function') mostrarToast('Business Service atualizado!', 'success');
+  }
+}
+
+// Função para Eliminar Business Service
+async function eliminarBS(nome) {
+  if (!confirm(`Deseja realmente eliminar o Business Service "${nome}"?`)) return;
+
+  const idx = BUSINESS_SERVICES.indexOf(nome);
+  if (idx !== -1) {
+    BUSINESS_SERVICES.splice(idx, 1);
+    localStorage.setItem('nestle_bs_v4', JSON.stringify(BUSINESS_SERVICES));
+    if (typeof renderizarListasBSYProductos === 'function') renderizarListasBSYProductos();
+    if (typeof poblarSelects === 'function') poblarSelects();
+    if (typeof mostrarToast === 'function') mostrarToast(`"${nome}" eliminado com sucesso!`, 'warning');
+  }
+}
