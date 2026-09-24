@@ -2251,6 +2251,12 @@ function cambiarVista(vista) {
     return;
   }
 
+  if (vista === 'bs' || vista === 'productos') {
+    if (typeof renderizarListasBSYProductos === 'function') {
+      renderizarListasBSYProductos();
+    }
+  }
+
   appState.vistaActiva=vista;
   document.querySelectorAll('.tab-btn').forEach(btn=>{
     const act=btn.dataset.view===vista;
