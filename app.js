@@ -2715,3 +2715,73 @@ function actualizarSelectBSModal() {
     }
   });
 })();
+// ==========================================
+// SINCRONIZAÇÃO DO MODAL POP-UP DE NUEVO BUSINESS SERVICE
+// ==========================================
+
+// Função para preencher todos os selects de Business Service da tela e do modal
+function poblarSelectsBSGlobal() {
+  const listaBS = (typeof BUSINESS_SERVICES !== 'undefined' && Array.isArray(BUSINESS_SERVICES)) 
+    ? BUSINESS_SERVICES 
+    : JSON.parse(localStorage.getItem('nestle_bs_v4')) || ["Finance", "Supply Chain", "HR", "IT", "Sales & Marketing"];
+
+  // Procura todos os dropdowns de Business Service no formulário e no popup
+  document.querySelectorAll('select').forEach(sel => {
+    const isSelectBS = sel.id.toLowerCase().includes('bs') || 
+                       sel.name === 'business_service' || 
+                       sel.previousElementSibling?.textContent.includes('Business Service') ||
+                       Array.from(sel.options).some(opt => opt.value === 'Finance' || opt.text === 'Finance');
+
+    if (isSelectBS) {
+      const valorAtual = sel.value;
+      sel.innerHTML = '<option value="">Selecciona Business Service...</option>' + 
+        listaBS.map(bs => `<option value="${bs}">${bs}</option>`).join('');
+      if (valorAtual && listaBS.includes(valorAtual)) {
+        sel.value = valorAtual;
+      }
+    }
+  });
+}
+
+// Intercepta a abertura do modal e o clique no botão "Guardar en Base de Datos" do pop-up
+document.addEventListener('click', function(e) {
+  // Quando clica no botão "Guardar en Base de Datos" do pop-up de Novo Business Service
+  const btnGuardarPopUp = e.target.closest('button');
+  if (btnGuardarPopUp && (btnGuardarPopUp.textContent.includes('Guardar en Base de Datos') || btnGuardarPopUp.textContent.includes('Guardar'))) {
+    const modalPopUp = btnGuardarPopUp.closest('.modal, [id*="modal"], div[class*="fixed"]');
+    if (modalPopUp && modalPopUp.textContent.includes('Nuevo Business Service')) {
+      const inputNome = modalPopUp.querySelector('input[type="text"]');
+      const nomeNovo = inputNome ? inputNome.value.trim() : '';
+
+      if (nomeNovo) {
+        if (typeof BUSINESS_SERVICES === 'undefined' || !Array.isArray(BUSINESS_SERVICES)) {
+          window.BUSINESS_SERVICES = JSON.parse(localStorage.getItem('nestle_bs_v4')) || ["Finance", "Supply Chain", "HR", "IT", "Sales & Marketing"];
+        }
+
+        if (!BUSINESS_SERVICES.includes(nomeNovo)) {
+          BUSINESS_SERVICES.push(nomeNovo);
+          localStorage.setItem('nestle_bs_v4', JSON.stringify(BUSINESS_SERVICES));
+          
+          // Atualiza as listas na aba administrativa e nos formulários
+          if (typeof renderizarListasBSYProductos === 'function') renderizarListasBSYProductos();
+          poblarSelectsBSGlobal();
+
+          // Limpa o input e fecha o pop-up
+          inputNome.value = '';
+          modalPopUp.classList.add('hidden');
+          if (typeof mostrarToast === 'function') mostrarToast(`Business Service "${nomeNovo}" guardado!`, 'success');
+        }
+      }
+    }
+  }
+
+  // Se abrir o modal de Nova Change, recarrega as opções do select
+  if (e.target.closest('#btnNuevaChange, [onclick*="abrirModal"]')) {
+    setTimeout(poblarSelectsBSGlobal, 150);
+  }
+});
+
+// Atualiza os selects ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(poblarSelectsBSGlobal, 500);
+});
