@@ -798,15 +798,12 @@
         <i class="fa-solid fa-boxes-stacked text-blue-600"></i>Gestión de Productos / Líneas
       </h3>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-6 bg-slate-50 p-3 border border-slate-200 rounded-xl">
-      <select id="selTabBSParaProducto" class="p-2 border border-slate-300 rounded-lg text-xs font-semibold bg-white">
-        <option value="">Selecciona Business Service...</option>
-      </select>
-      <input type="text" id="inpTabNuevoProducto" placeholder="Nombre del Producto / Línea..." class="p-2 border border-slate-300 rounded-lg text-xs font-semibold bg-white">
-      <button type="button" onclick="agregarProductoDesdeTab()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all flex items-center gap-1.5 justify-center">
-        <i class="fa-solid fa-plus"></i> Agregar Producto
-      </button>
-    </div>
+    <div class="flex gap-2 mb-6 bg-slate-50 p-3 border border-slate-200 rounded-xl">
+  <input type="text" id="inpTabNuevoProducto" placeholder="Nombre del Producto / Línea..." class="flex-1 p-2 border border-slate-300 rounded-lg text-xs font-semibold bg-white">
+  <button type="button" onclick="agregarProductoDesdeTab()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all flex items-center gap-1.5 shrink-0">
+    <i class="fa-solid fa-plus"></i> Agregar Producto
+  </button>
+</div>
     <div id="contenedorTabProductos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
   </div>
 </div>
