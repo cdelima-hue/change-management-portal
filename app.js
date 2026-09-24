@@ -2655,3 +2655,63 @@ function eliminarPais(id) {
     renderizarTablaPaises();
   }
 })();
+// ==========================================
+// PREENCHIMENTO DINÂMICO DO SELECT DE BUSINESS SERVICE NO MODAL
+// ==========================================
+
+// Função para atualizar o dropdown de Business Services no modal de Nova Change
+function actualizarSelectBSModal() {
+  const selectBS = document.querySelector('select[name="business_service"]') || document.getElementById('selBusinessService') || document.querySelector('select:has(option[value="Finance"])');
+
+  // Recupera do localStorage ou da variável global
+  const listaBS = (typeof BUSINESS_SERVICES !== 'undefined' && Array.isArray(BUSINESS_SERVICES)) 
+    ? BUSINESS_SERVICES 
+    : JSON.parse(localStorage.getItem('nestle_bs_v4')) || ["Finance", "Supply Chain", "HR", "IT", "Sales & Marketing"];
+
+  // Localiza todos os selects de Business Service dentro de modais
+  const todosSelectsBS = document.querySelectorAll('select');
+  todosSelectsBS.forEach(sel => {
+    // Verifica se é o select de Business Service pelo contexto de opções ou ID
+    if (sel.id.toLowerCase().includes('bs') || sel.name === 'business_service' || Array.from(sel.options).some(opt => opt.value === 'Finance' || opt.text === 'Finance')) {
+      const valorAtual = sel.value;
+      sel.innerHTML = '<option value="">Selecciona Business Service...</option>' + 
+        listaBS.map(bs => `<option value="${bs}">${bs}</option>`).join('');
+      if (valorAtual && listaBS.includes(valorAtual)) {
+        sel.value = valorAtual;
+      }
+    }
+  });
+}
+
+// Conecta o preenchimento ao abrir o modal de Nova Change
+(function conectarModalBS() {
+  const originalAbrirModal = window.abrirModalNuevoChange || window.abrirModalChange;
+  if (typeof originalAbrirModal === 'function') {
+    window.abrirModalNuevoChange = function() {
+      originalAbrirModal();
+      actualizarSelectBSModal();
+    };
+  }
+
+  // Intercepta qualquer clique em botões de "+ Change" ou no atalho "+ Nuevo" de BS
+  document.addEventListener('click', function(e) {
+    // Se clicar no atalho + Nuevo de Business Service
+    if (e.target && (e.target.innerText === '+ Nuevo' || e.target.textContent.includes('+ Nuevo'))) {
+      const containerBS = e.target.closest('div');
+      if (containerBS && containerBS.innerText.includes('Business Service')) {
+        e.preventDefault();
+        // Se estiver num modal, fecha o modal primeiro se existir
+        const modal = e.target.closest('.modal, [id*="modal"]');
+        if (modal) modal.classList.add('hidden');
+        // Redireciona para a aba de Business Services
+        if (typeof cambiarVista === 'function') cambiarVista('bs');
+      }
+    }
+
+    // Se abrir o modal de nova change, atualiza as opções
+    const btnChange = e.target.closest('#btnNuevaChange, [onclick*="abrirModal"]');
+    if (btnChange) {
+      setTimeout(actualizarSelectBSModal, 100);
+    }
+  });
+})();
