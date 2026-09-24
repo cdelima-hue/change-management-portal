@@ -2636,3 +2636,22 @@ function eliminarPais(id) {
   if (typeof poblarSelects === 'function') poblarSelects();
   if (typeof mostrarToast === 'function') mostrarToast(`País removido!`, 'warning');
 }
+// Garantir que a renderização dos países atualizada seja chamada ao abrir a aba e no carregamento
+(function conectarRenderizadorPaises() {
+  const originalCambiarVista = window.cambiarVista;
+  window.cambiarVista = function(vista) {
+    if (typeof originalCambiarVista === 'function') {
+      originalCambiarVista(vista);
+    }
+    if (vista === 'config') {
+      renderizarTablaPaises();
+    }
+  };
+
+  // Carrega a tabela na inicialização imediata
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderizarTablaPaises);
+  } else {
+    renderizarTablaPaises();
+  }
+})();
