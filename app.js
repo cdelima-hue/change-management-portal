@@ -2438,3 +2438,43 @@ async function eliminarProducto(prod) {
     if (typeof mostrarToast === 'function') mostrarToast(`Produto "${prod}" eliminado!`, 'warning');
   }
 }
+// Função para Adicionar Novo Produto (Independente)
+async function agregarProductoDesdeTab() {
+  const inpProd = document.getElementById('inpTabNuevoProducto');
+  const prod = inpProd ? inpProd.value.trim() : '';
+
+  if (!prod) {
+    if (typeof mostrarToast === 'function') mostrarToast('Digite o nome do Produto', 'warning');
+    else alert('Digite o nome do Produto');
+    return;
+  }
+
+  if (typeof PRODUCTOS_LISTA === 'undefined' || !Array.isArray(PRODUCTOS_LISTA)) {
+    const prodSaved = localStorage.getItem('nestle_productos_v4');
+    window.PRODUCTOS_LISTA = prodSaved ? JSON.parse(prodSaved) : ["Accounts Payable", "Logistics", "Payroll", "Software Support"];
+  }
+
+  if (!PRODUCTOS_LISTA.includes(prod)) {
+    PRODUCTOS_LISTA.push(prod);
+    localStorage.setItem('nestle_productos_v4', JSON.stringify(PRODUCTOS_LISTA));
+    inpProd.value = '';
+    if (typeof renderizarListasBSYProductos === 'function') renderizarListasBSYProductos();
+    if (typeof poblarSelects === 'function') poblarSelects();
+    if (typeof mostrarToast === 'function') mostrarToast(`Produto "${prod}" adicionado!`, 'success');
+  } else {
+    if (typeof mostrarToast === 'function') mostrarToast('Este produto já existe.', 'warning');
+  }
+}
+
+// Função para Eliminar Produto
+async function eliminarProducto(prod) {
+  if (!confirm(`Deseja realmente eliminar o produto "${prod}"?`)) return;
+
+  if (typeof PRODUCTOS_LISTA !== 'undefined' && Array.isArray(PRODUCTOS_LISTA)) {
+    window.PRODUCTOS_LISTA = PRODUCTOS_LISTA.filter(p => p !== prod);
+    localStorage.setItem('nestle_productos_v4', JSON.stringify(PRODUCTOS_LISTA));
+    if (typeof renderizarListasBSYProductos === 'function') renderizarListasBSYProductos();
+    if (typeof poblarSelects === 'function') poblarSelects();
+    if (typeof mostrarToast === 'function') mostrarToast(`Produto "${prod}" eliminado!`, 'warning');
+  }
+}
