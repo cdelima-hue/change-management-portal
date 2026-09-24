@@ -2525,3 +2525,114 @@ function renderizarListasBSYProductos() {
     }
   }
 })();
+// ==========================================
+// MÓDULO DE PAÍSES (PERSISTENTE - CRUD)
+// ==========================================
+
+// Inicializar Países do localStorage
+(function inicializarPaisesPersistentes() {
+  const paisesSalvos = localStorage.getItem('nestle_paises_v4');
+  if (paisesSalvos) {
+    try {
+      window.PAISES_CONFIG = JSON.parse(paisesSalvos);
+    } catch(e) {
+      console.error("Erro ao carregar Países", e);
+    }
+  } else if (typeof PAISES_CONFIG === 'undefined' || !Array.isArray(PAISES_CONFIG)) {
+    window.PAISES_CONFIG = [
+      { id: '1', nombre: 'Perú', horas: 100, maxChange: 30, color: '#0891b2', activo: true },
+      { id: '2', nombre: 'Ecuador', horas: 120, maxChange: 30, color: '#059669', activo: true }
+    ];
+  }
+})();
+
+// Função para Renderizar a Tabela de Países
+function renderizarTablaPaises() {
+  const tbody = document.getElementById('tbodyConfigPaises');
+  if (!tbody) return;
+
+  if (!Array.isArray(PAISES_CONFIG) || PAISES_CONFIG.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">Nenhum país cadastrado.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = PAISES_CONFIG.map(p => `
+    <tr>
+      <td class="p-2.5 font-bold text-slate-700">${p.nombre}</td>
+      <td class="p-2.5 text-center">
+        <input type="number" value="${p.horas}" onchange="modificarHorasPais('${p.id}', this.value)" class="w-20 text-center p-1 border border-slate-300 rounded font-bold text-xs">
+      </td>
+      <td class="p-2.5 text-center font-semibold text-slate-500">${p.maxChange || 30}h</td>
+      <td class="p-2.5 text-center">
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${p.activo !== false ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}">
+          ${p.activo !== false ? 'Activo' : 'Inactivo'}
+        </span>
+      </td>
+      <td class="p-2.5 text-center">
+        <button type="button" onclick="eliminarPais('${p.id}')" class="p-1 text-slate-400 hover:text-rose-600 transition-all" title="Eliminar País">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// Função para Agregar Novo País
+async function onAgregarPais() {
+  const inpNombre = document.getElementById('inpNuevoPaisNombre');
+  const inpHoras = document.getElementById('inpNuevoPaisHoras');
+  const inpColor = document.getElementById('inpNuevoPaisColor');
+
+  const nombre = inpNombre ? inpNombre.value.trim() : '';
+  const horas = inpHoras ? parseInt(inpHoras.value) : 100;
+  const color = inpColor ? inpColor.value : '#0891b2';
+
+  if (!nombre) {
+    if (typeof mostrarToast === 'function') mostrarToast('Digite o nome do país', 'warning');
+    else alert('Digite o nome do país');
+    return;
+  }
+
+  const novoPais = {
+    id: Date.now().toString(),
+    nombre: nombre,
+    horas: horas || 100,
+    maxChange: 30,
+    color: color,
+    activo: true
+  };
+
+  PAISES_CONFIG.push(novoPais);
+  localStorage.setItem('nestle_paises_v4', JSON.stringify(PAISES_CONFIG));
+
+  if (inpNombre) inpNombre.value = '';
+  renderizarTablaPaises();
+  if (typeof poblarSelects === 'function') poblarSelects();
+  if (typeof mostrarToast === 'function') mostrarToast(`País "${nombre}" adicionado!`, 'success');
+}
+
+// Alias de suporte para o botão caso chame agregarNuevoPais
+function agregarNuevoPais() { onAgregarPais(); }
+
+// Função para Modificar Horas do País
+function modificarHorasPais(id, novasHoras) {
+  const pais = PAISES_CONFIG.find(p => p.id === id);
+  if (pais) {
+    pais.horas = parseInt(novasHoras) || 0;
+    localStorage.setItem('nestle_paises_v4', JSON.stringify(PAISES_CONFIG));
+    if (typeof mostrarToast === 'function') mostrarToast('Horas atualizadas!', 'success');
+  }
+}
+
+// Função para Eliminar País
+function eliminarPais(id) {
+  const pais = PAISES_CONFIG.find(p => p.id === id);
+  const nombre = pais ? pais.nombre : '';
+  if (!confirm(`Deseja realmente eliminar o país "${nombre}"?`)) return;
+
+  PAISES_CONFIG = PAISES_CONFIG.filter(p => p.id !== id);
+  localStorage.setItem('nestle_paises_v4', JSON.stringify(PAISES_CONFIG));
+  renderizarTablaPaises();
+  if (typeof poblarSelects === 'function') poblarSelects();
+  if (typeof mostrarToast === 'function') mostrarToast(`País removido!`, 'warning');
+}
