@@ -2280,3 +2280,133 @@ function mostrarToast(msg,tipo='info') {
   c.appendChild(t);
   setTimeout(()=>{t.style.cssText='opacity:0;transform:translateY(10px);transition:all .3s';setTimeout(()=>t.remove(),300);},4000);
 }
+// ==========================================
+// GESTÃO DE BUSINESS SERVICES E PRODUCTOS (INCLUIR / EDITAR / EXCLUIR)
+// ==========================================
+
+// 1. Renderizar listas nas abas
+function renderizarListasBSYProductos() {
+  const contBS = document.getElementById('contenedorTabBS');
+  const contProd = document.getElementById('contenedorTabProductos');
+  const selBS = document.getElementById('selTabBSParaProducto');
+
+  // Renderizar Business Services
+  if (contBS && typeof BUSINESS_SERVICES !== 'undefined') {
+    contBS.innerHTML = BUSINESS_SERVICES.map(bs => `
+      <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center">
+        <span class="text-xs font-bold text-slate-700">${bs}</span>
+        <div class="flex gap-1">
+          <button onclick="editarBS('${bs}')" class="p-1 text-slate-400 hover:text-blue-600 text-xs"><i class="fa-solid fa-pen"></i></button>
+          <button onclick="eliminarBS('${bs}')" class="p-1 text-slate-400 hover:text-rose-600 text-xs"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Preencher Select de BS na aba de Produtos
+  if (selBS && typeof BUSINESS_SERVICES !== 'undefined') {
+    selBS.innerHTML = '<option value="">Selecciona Business Service...</option>' + 
+      BUSINESS_SERVICES.map(bs => `<option value="${bs}">${bs}</option>`).join('');
+  }
+
+  // Renderizar Produtos
+  if (contProd && typeof PRODUCTOS_POR_BS !== 'undefined') {
+    let html = '';
+    Object.keys(PRODUCTOS_POR_BS).forEach(bs => {
+      PRODUCTOS_POR_BS[bs].forEach(prod => {
+        html += `
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center">
+            <div>
+              <span class="block text-xs font-bold text-slate-700">${prod}</span>
+              <span class="block text-[10px] text-slate-400">BS: ${bs}</span>
+            </div>
+            <div class="flex gap-1">
+              <button onclick="eliminarProducto('${bs}', '${prod}')" class="p-1 text-slate-400 hover:text-rose-600 text-xs"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        `;
+      });
+    });
+    contProd.innerHTML = html || '<p class="text-xs text-slate-400">Nenhum produto cadastrado.</p>';
+  }
+}
+
+// 2. Ações de Incluir / Editar / Excluir BS
+async function agregarBSDesdeTab() {
+  const inp = document.getElementById('inpTabNuevoBS');
+  const nome = inp ? inp.value.trim() : '';
+  if (!nome) return mostrarToast('Digite o nome do Business Service', 'warning');
+  
+  if (typeof guardarNuevoBS === 'function') {
+    await guardarNuevoBS(nome);
+    inp.value = '';
+    renderizarListasBSYProductos();
+    if (typeof poblarSelects === 'function') poblarSelects();
+    mostrarToast(`Business Service "${nome}" adicionado!`, 'success');
+  }
+}
+
+async function editarBS(nomeAntigo) {
+  const novoNome = prompt('Editar nome do Business Service:', nomeAntigo);
+  if (!novoNome || novoNome.trim() === '' || novoNome === nomeAntigo) return;
+  
+  const idx = BUSINESS_SERVICES.indexOf(nomeAntigo);
+  if (idx !== -1) {
+    BUSINESS_SERVICES[idx] = novoNome.trim();
+    if (PRODUCTOS_POR_BS[nomeAntigo]) {
+      PRODUCTOS_POR_BS[novoNome.trim()] = PRODUCTOS_POR_BS[nomeAntigo];
+      delete PRODUCTOS_POR_BS[nomeAntigo];
+    }
+    localStorage.setItem('nestle_bs_v4', JSON.stringify(BUSINESS_SERVICES));
+    localStorage.setItem('nestle_productos_v4', JSON.stringify(PRODUCTOS_POR_BS));
+    renderizarListasBSYProductos();
+    if (typeof poblarSelects === 'function') poblarSelects();
+    mostrarToast('Business Service atualizado com sucesso!', 'success');
+  }
+}
+
+async function eliminarBS(nome) {
+  if (!confirm(`Deseja realmente excluir o Business Service "${nome}"?`)) return;
+  const idx = BUSINESS_SERVICES.indexOf(nome);
+  if (idx !== -1) {
+    BUSINESS_SERVICES.splice(idx, 1);
+    delete PRODUCTOS_POR_BS[nome];
+    localStorage.setItem('nestle_bs_v4', JSON.stringify(BUSINESS_SERVICES));
+    localStorage.setItem('nestle_productos_v4', JSON.stringify(PRODUCTOS_POR_BS));
+    renderizarListasBSYProductos();
+    if (typeof poblarSelects === 'function') poblarSelects();
+    mostrarToast(`Business Service "${nome}" removido.`, 'warning');
+  }
+}
+
+// 3. Ações de Incluir / Excluir Produto
+async function agregarProductoDesdeTab() {
+  const selBS = document.getElementById('selTabBSParaProducto');
+  const inpProd = document.getElementById('inpTabNuevoProducto');
+  const bs = selBS ? selBS.value : '';
+  const prod = inpProd ? inpProd.value.trim() : '';
+
+  if (!bs) return mostrarToast('Selecione um Business Service', 'warning');
+  if (!prod) return mostrarToast('Digite o nome do Produto', 'warning');
+
+  if (!PRODUCTOS_POR_BS[bs]) PRODUCTOS_POR_BS[bs] = [];
+  if (!PRODUCTOS_POR_BS[bs].includes(prod)) {
+    PRODUCTOS_POR_BS[bs].push(prod);
+    localStorage.setItem('nestle_productos_v4', JSON.stringify(PRODUCTOS_POR_BS));
+    inpProd.value = '';
+    renderizarListasBSYProductos();
+    if (typeof poblarSelects === 'function') poblarSelects();
+    mostrarToast(`Produto "${prod}" adicionado ao BS ${bs}!`, 'success');
+  }
+}
+
+async function eliminarProducto(bs, prod) {
+  if (!confirm(`Deseja excluir o produto "${prod}" do Business Service "${bs}"?`)) return;
+  if (PRODUCTOS_POR_BS[bs]) {
+    PRODUCTOS_POR_BS[bs] = PRODUCTOS_POR_BS[bs].filter(p => p !== prod);
+    localStorage.setItem('nestle_productos_v4', JSON.stringify(PRODUCTOS_POR_BS));
+    renderizarListasBSYProductos();
+    if (typeof poblarSelects === 'function') poblarSelects();
+    mostrarToast(`Produto "${prod}" removido.`, 'warning');
+  }
+}
