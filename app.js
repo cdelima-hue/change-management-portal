@@ -2343,19 +2343,27 @@ function renderizarListasBSYProductos() {
     contProd.innerHTML = html || '<p class="text-xs text-slate-400">Nenhum produto cadastrado.</p>';
   }
 }
+// ==========================================
+// GESTÃO DE BUSINESS SERVICES E PRODUCTOS (INCLUIR / EDITAR / EXCLUIR)
+// ==========================================
 
 // 2. Ações de Incluir / Editar / Excluir BS
 async function agregarBSDesdeTab() {
   const inp = document.getElementById('inpTabNuevoBS');
   const nome = inp ? inp.value.trim() : '';
   if (!nome) return mostrarToast('Digite o nome do Business Service', 'warning');
-  
-  if (typeof guardarNuevoBS === 'function') {
-    await guardarNuevoBS(nome);
+
+  if (!BUSINESS_SERVICES.includes(nome)) {
+    BUSINESS_SERVICES.push(nome);
+    if (!PRODUCTOS_POR_BS[nome]) PRODUCTOS_POR_BS[nome] = [];
+    localStorage.setItem('nestle_bs_v4', JSON.stringify(BUSINESS_SERVICES));
+    localStorage.setItem('nestle_productos_v4', JSON.stringify(PRODUCTOS_POR_BS));
     inp.value = '';
     renderizarListasBSYProductos();
     if (typeof poblarSelects === 'function') poblarSelects();
-    mostrarToast(`Business Service "${nome}" adicionado!`, 'success');
+    mostrarToast(`Business Service "${nome}" adicionado com sucesso!`, 'success');
+  } else {
+    mostrarToast('Este Business Service já existe.', 'warning');
   }
 }
 
@@ -2409,7 +2417,9 @@ async function agregarProductoDesdeTab() {
     inpProd.value = '';
     renderizarListasBSYProductos();
     if (typeof poblarSelects === 'function') poblarSelects();
-    mostrarToast(`Produto "${prod}" adicionado ao BS ${bs}!`, 'success');
+    mostrarToast(`Produto "${prod}" adicionado com sucesso!`, 'success');
+  } else {
+    mostrarToast('Este produto já existe neste Business Service.', 'warning');
   }
 }
 
