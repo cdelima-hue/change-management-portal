@@ -2262,7 +2262,7 @@ function cambiarVista(vista) {
     const act=btn.dataset.view===vista;
     btn.className=`tab-btn py-1.5 px-3 font-${act?'bold text-blue-600 border-b-2 border-blue-600':'semibold text-slate-500 hover:text-slate-700 border-b-2 border-transparent'} text-xs flex items-center gap-1.5 whitespace-nowrap`;
   });
-  ['kanban','fases','dashboard','reportes','tabla','historial','config','usuarios','branding'].forEach(v=>{
+  ['kanban', 'fases', 'dashboard', 'reportes', 'tabla', 'historial', 'config', 'usuarios', 'branding', 'bs', 'productos'].forEach(v=>{
     const el=document.getElementById('secao'+v.charAt(0).toUpperCase()+v.slice(1));
     if(el) el.classList.toggle('hidden',v!==vista);
   });
