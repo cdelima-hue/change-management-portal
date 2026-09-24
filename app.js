@@ -2343,3 +2343,29 @@ function renderizarListasBSYProductos() {
     contProd.innerHTML = html || '<p class="text-xs text-slate-400">Nenhum produto cadastrado.</p>';
   }
 }
+// Função para adicionar novo Business Service na aba
+async function agregarBSDesdeTab() {
+  const inp = document.getElementById('inpTabNuevoBS');
+  const nome = inp ? inp.value.trim() : '';
+  if (!nome) {
+    if (typeof mostrarToast === 'function') mostrarToast('Digite o nome do Business Service', 'warning');
+    else alert('Digite o nome do Business Service');
+    return;
+  }
+
+  if (typeof BUSINESS_SERVICES === 'undefined' || !Array.isArray(BUSINESS_SERVICES)) {
+    const bsSaved = localStorage.getItem('nestle_bs_v4');
+    window.BUSINESS_SERVICES = bsSaved ? JSON.parse(bsSaved) : ["Finance", "Supply Chain", "HR", "IT", "Sales & Marketing"];
+  }
+
+  if (!BUSINESS_SERVICES.includes(nome)) {
+    BUSINESS_SERVICES.push(nome);
+    localStorage.setItem('nestle_bs_v4', JSON.stringify(BUSINESS_SERVICES));
+    inp.value = '';
+    if (typeof renderizarListasBSYProductos === 'function') renderizarListasBSYProductos();
+    if (typeof poblarSelects === 'function') poblarSelects();
+    if (typeof mostrarToast === 'function') mostrarToast(`Business Service "${nome}" adicionado!`, 'success');
+  } else {
+    if (typeof mostrarToast === 'function') mostrarToast('Este Business Service já existe.', 'warning');
+  }
+}
