@@ -2478,3 +2478,39 @@ async function eliminarProducto(prod) {
     if (typeof mostrarToast === 'function') mostrarToast(`Produto "${prod}" eliminado!`, 'warning');
   }
 }
+// Sobrescreve a renderização para exibir os produtos da lista simples
+function renderizarListasBSYProductos() {
+  // Renderiza Business Services
+  const contBS = document.getElementById('contenedorTabBS');
+  if (contBS && typeof BUSINESS_SERVICES !== 'undefined') {
+    contBS.innerHTML = BUSINESS_SERVICES.map(bs => `
+      <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center shadow-sm">
+        <span class="text-xs font-bold text-slate-700">${bs}</span>
+        <div class="flex gap-1">
+          <button type="button" onclick="editarBS('${bs}')" class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg text-xs transition-all"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" onclick="eliminarBS('${bs}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg text-xs transition-all"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Renderiza Produtos
+  const contProd = document.getElementById('contenedorTabProductos');
+  if (contProd) {
+    if (typeof PRODUCTOS_LISTA === 'undefined' || !Array.isArray(PRODUCTOS_LISTA)) {
+      const prodSaved = localStorage.getItem('nestle_productos_v4');
+      window.PRODUCTOS_LISTA = prodSaved ? JSON.parse(prodSaved) : ["Accounts Payable", "Logistics", "Payroll", "Software Support"];
+    }
+
+    if (PRODUCTOS_LISTA.length === 0) {
+      contProd.innerHTML = '<p class="text-xs text-slate-400 col-span-3">Nenhum produto cadastrado.</p>';
+    } else {
+      contProd.innerHTML = PRODUCTOS_LISTA.map(prod => `
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center shadow-sm">
+          <span class="text-xs font-bold text-slate-700">${prod}</span>
+          <button type="button" onclick="eliminarProducto('${prod}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg text-xs transition-all" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `).join('');
+    }
+  }
+}
