@@ -1401,10 +1401,15 @@
             <button onclick="fecharModalAdminPaises()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="flex justify-between items-center mb-3">
-            <span class="text-xs font-bold text-slate-700">Países Configurados:</span>
-            <button type="button" onclick="abrirModalCrearRapidoPais()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold flex items-center gap-1">
-                <i class="fa-solid fa-plus"></i> + Nuevo País
-            </button>
+  <span class="text-xs font-bold text-slate-700">Países y Catálogos Configurados:</span>
+  <div class="flex gap-2">
+    <button type="button" onclick="abrirModalCrearRapidoBS()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center gap-1">
+      <i class="fa-solid fa-plus"></i> + Nuevo Business Service
+    </button>
+    <button type="button" onclick="abrirModalCrearRapidoPais()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold flex items-center gap-1">
+      <i class="fa-solid fa-plus"></i> + Nuevo País
+    </button>
+  </div>
         </div>
         <div class="max-h-80 overflow-y-auto border border-slate-200 rounded-xl mb-3">
             <table class="w-full text-xs">
