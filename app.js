@@ -2514,3 +2514,14 @@ function renderizarListasBSYProductos() {
     }
   }
 }
+// Garantir que os Business Services salvos sejam carregados ao iniciar a página
+(function inicializarBSPersistente() {
+  const bsSalvos = localStorage.getItem('nestle_bs_v4');
+  if (bsSalvos) {
+    try {
+      window.BUSINESS_SERVICES = JSON.parse(bsSalvos);
+    } catch(e) {
+      console.error("Erro ao carregar Business Services do localStorage", e);
+    }
+  }
+})();
