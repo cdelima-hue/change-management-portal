@@ -2251,22 +2251,29 @@ function cambiarVista(vista) {
     return;
   }
 
+  appState.vistaActiva = vista;
+
+  // Esconde todas as seções e views
+  document.querySelectorAll('.secao-view, .tab-content').forEach(el => el.classList.add('hidden'));
+
+  // Exibe a seção clicada
+  const elAtivo = document.getElementById(`view-${vista}`) || document.getElementById(`secao${vista.charAt(0).toUpperCase() + vista.slice(1)}`);
+  if (elAtivo) {
+    elAtivo.classList.remove('hidden');
+  }
+
+  // Destaca o botão ativo na barra superior
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    const act = btn.dataset.view === vista;
+    btn.className = `tab-btn py-1.5 px-3 font-${act ? 'bold text-blue-600 border-b-2 border-blue-600' : 'semibold text-slate-500 hover:text-slate-700 border-b-2 border-transparent'} text-xs flex items-center gap-1.5`;
+  });
+
+  // Carrega e renderiza as listas de Business Services e Produtos
   if (vista === 'bs' || vista === 'productos') {
     if (typeof renderizarListasBSYProductos === 'function') {
       renderizarListasBSYProductos();
     }
   }
-
-  appState.vistaActiva=vista;
-  document.querySelectorAll('.tab-btn').forEach(btn=>{
-    const act=btn.dataset.view===vista;
-    btn.className=`tab-btn py-1.5 px-3 font-${act?'bold text-blue-600 border-b-2 border-blue-600':'semibold text-slate-500 hover:text-slate-700 border-b-2 border-transparent'} text-xs flex items-center gap-1.5 whitespace-nowrap`;
-  });
-  ['kanban', 'fases', 'dashboard', 'reportes', 'tabla', 'historial', 'config', 'usuarios', 'branding', 'bs', 'productos'].forEach(v=>{
-    const el=document.getElementById('secao'+v.charAt(0).toUpperCase()+v.slice(1));
-    if(el) el.classList.toggle('hidden',v!==vista);
-  });
-  renderizarTodo();
 }
 
 function setIndicadorSync(st) {
