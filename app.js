@@ -2785,3 +2785,68 @@ document.addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(poblarSelectsBSGlobal, 500);
 });
+// ==========================================
+// SINCRONIZAÇÃO DO CAMPO & POP-UP DE PRODUCTO
+// ==========================================
+
+// Função para preencher os dropdowns de Produto com a lista independente
+function poblarSelectsProductosGlobal() {
+  const listaProd = (typeof PRODUCTOS_LISTA !== 'undefined' && Array.isArray(PRODUCTOS_LISTA)) 
+    ? PRODUCTOS_LISTA 
+    : JSON.parse(localStorage.getItem('nestle_productos_v4')) || ["Accounts Payable", "Logistics", "Payroll", "Software Support"];
+
+  document.querySelectorAll('select').forEach(sel => {
+    const isSelectProd = sel.id.toLowerCase().includes('producto') || 
+                        sel.name === 'producto' || 
+                        sel.previousElementSibling?.textContent.includes('Producto') ||
+                        Array.from(sel.options).some(opt => opt.value === 'Logistics' || opt.text === 'Logistics');
+
+    if (isSelectProd) {
+      const valorAtual = sel.value;
+      sel.innerHTML = '<option value="">Selecciona Producto...</option>' + 
+        listaProd.map(prod => `<option value="${prod}">${prod}</option>`).join('');
+      if (valorAtual && listaProd.includes(valorAtual)) {
+        sel.value = valorAtual;
+      }
+    }
+  });
+}
+
+// Intercepta a abertura e o salvamento pelo pop-up "Nuevo Producto"
+document.addEventListener('click', function(e) {
+  const btnGuardarPopUp = e.target.closest('button');
+  if (btnGuardarPopUp && (btnGuardarPopUp.textContent.includes('Guardar en Base de Datos') || btnGuardarPopUp.textContent.includes('Guardar'))) {
+    const modalPopUp = btnGuardarPopUp.closest('.modal, [id*="modal"], div[class*="fixed"]');
+    if (modalPopUp && (modalPopUp.textContent.includes('Nuevo Producto') || modalPopUp.textContent.includes('Producto / Línea'))) {
+      const inputNome = modalPopUp.querySelector('input[type="text"]');
+      const nomeNovo = inputNome ? inputNome.value.trim() : '';
+
+      if (nomeNovo) {
+        if (typeof PRODUCTOS_LISTA === 'undefined' || !Array.isArray(PRODUCTOS_LISTA)) {
+          window.PRODUCTOS_LISTA = JSON.parse(localStorage.getItem('nestle_productos_v4')) || ["Accounts Payable", "Logistics", "Payroll", "Software Support"];
+        }
+
+        if (!PRODUCTOS_LISTA.includes(nomeNovo)) {
+          PRODUCTOS_LISTA.push(nomeNovo);
+          localStorage.setItem('nestle_productos_v4', JSON.stringify(PRODUCTOS_LISTA));
+          
+          if (typeof renderizarListasBSYProductos === 'function') renderizarListasBSYProductos();
+          poblarSelectsProductosGlobal();
+
+          inputNome.value = '';
+          modalPopUp.classList.add('hidden');
+          if (typeof mostrarToast === 'function') mostrarToast(`Produto "${nomeNovo}" guardado!`, 'success');
+        }
+      }
+    }
+  }
+
+  if (e.target.closest('#btnNuevaChange, [onclick*="abrirModal"]')) {
+    setTimeout(poblarSelectsProductosGlobal, 150);
+  }
+});
+
+// Atualiza os selects ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(poblarSelectsProductosGlobal, 500);
+});
