@@ -985,19 +985,18 @@
                         <input type="text" id="inpChange" required placeholder="CHG0012345" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-blue-700 focus:border-blue-500 outline-none shadow-xs">
                     </div>
                     <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="text-xs font-black text-slate-800">3. Business Service *</label>
-                            <div class="flex items-center gap-1">
-                                <button type="button" onclick="abrirModalCrearRapidoBS()" class="text-[10px] text-blue-600 font-bold hover:underline" title="Crear nuevo Business Service">+ Nuevo</button>
-                                <span class="text-slate-300 text-[10px]">|</span>
-                                <button type="button" onclick="abrirModalAdminBS()" class="text-[10px] text-slate-500 hover:text-slate-800 font-bold" title="Administrar catálogo de Business Services">⚙️</button>
-                            </div>
-                        </div>
-                        <select id="inpBusinessService" required class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-500 outline-none shadow-xs">
-                            <!-- Se puebla dinámicamente desde base de datos -->
-                        </select>
-                    </div>
-                </div>
+        <div class="flex justify-between items-center mb-1">
+          <label class="block text-xs font-black text-slate-800">3. Business Service *</label>
+          <div class="flex items-center gap-1">
+            <button type="button" onclick="abrirModalCrearRapidoBS()" class="text-[10px] text-blue-600 font-bold hover:underline" title="Crear nuevo Business Service">+ Nuevo</button>
+            <span class="text-slate-300 text-[10px]">|</span>
+            <button type="button" onclick="abrirModalAdminBS()" class="text-[10px] text-slate-500 hover:text-slate-800 font-bold" title="Administrar catálogo de Business Services">⚙️</button>
+          </div>
+        </div>
+        <select id="inpBusinessService" required class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-500 outline-none shadow-xs">
+          <!-- Se puebla dinámicamente desde base de datos -->
+        </select>
+      </div>
 
                 <div>
                     <label class="block text-xs font-black text-slate-800 mb-1">4. Short Description (Descripción / Resumen) *</label>
