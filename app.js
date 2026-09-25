@@ -2972,3 +2972,48 @@ document.addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(limparVistaKanban, 300);
 });
+// ==========================================
+// SINCRONIZAÇÃO AUTOMÁTICA DO KANBAN COM A MATRIZ DE CHECKPOINTS
+// ==========================================
+
+function sincronizarFaseComMatriz(changeId, numeroFase) {
+  // Atualiza no localStorage
+  let cambios = JSON.parse(localStorage.getItem('nestle_changes_v4')) || [];
+  let cambio = cambios.find(c => c.id == changeId || c.number == changeId);
+  
+  if (cambio) {
+    cambio.faseActual = parseInt(numeroFase);
+    
+    // Atualiza as datas dos checkpoints até a fase atual
+    if (!cambio.checkpoints) cambio.checkpoints = {};
+    const hoy = new Date().toISOString().split('T')[0];
+    
+    for (let i = 1; i <= parseInt(numeroFase); i++) {
+      if (!cambio.checkpoints[i]) {
+        cambio.checkpoints[i] = hoy;
+      }
+    }
+    
+    localStorage.setItem('nestle_changes_v4', JSON.stringify(cambios));
+    
+    // Atualiza a tabela da Matriz na tela
+    if (typeof renderizarMatrizCheckpoints === 'function') {
+      renderizarMatrizCheckpoints();
+    }
+  }
+}
+
+// Detecta quando um card é arrastado e solto em uma nova coluna do Kanban
+document.addEventListener('drop', function(e) {
+  const cardArrastado = document.querySelector('.dragging') || e.target.closest('[data-change-id]');
+  const colunaDestino = e.target.closest('[data-fase], [data-coluna], .kanban-column');
+  
+  if (cardArrastado && colunaDestino) {
+    const changeId = cardArrastado.getAttribute('data-change-id') || cardArrastado.id;
+    const numFase = colunaDestino.getAttribute('data-fase') || colunaDestino.getAttribute('data-index');
+    
+    if (changeId && numFase) {
+      setTimeout(() => sincronizarFaseComMatriz(changeId, numFase), 100);
+    }
+  }
+});
