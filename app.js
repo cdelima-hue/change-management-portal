@@ -2929,3 +2929,46 @@ document.addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(poblarSelectsPaisesGlobal, 500);
 });
+// ==========================================
+// LIMPEZA DA VISTA DO KANBAN (OCULTAR MÓDULOS EXTRAS)
+// ==========================================
+
+function limparVistaKanban() {
+  // Verifica se a vista Kanban está ativa no momento
+  const vistaKanban = document.getElementById('sec-kanban') || document.querySelector('[id*="kanban"]');
+  
+  if (vistaKanban && !vistaKanban.classList.contains('hidden')) {
+    // Esconde gráficos, matriz de checkpoints e históricos dentro do Kanban
+    const elementosParaOcultar = [
+      '#sec-reportes',
+      '.matriz-checkpoints',
+      '[id*="chart"]',
+      '[id*="reporte"]',
+      '[id*="auditoria"]',
+      '[id*="acumulado"]',
+      '[id*="comparativo"]'
+    ];
+
+    elementosParaOcultar.forEach(selector => {
+      document.querySelectorAll(selector).forEach(el => {
+        // Se o elemento não for o container principal das colunas do Kanban, oculta
+        if (!el.classList.contains('kanban-board') && !el.id.includes('kanban-col')) {
+          el.style.display = 'none';
+        }
+      });
+    });
+  }
+}
+
+// Executa a limpeza sempre que trocar para a aba Kanban
+document.addEventListener('click', function(e) {
+  const btnKanban = e.target.closest('[onclick*="kanban"], [data-vista="kanban"], button:contains("Kanban")');
+  if (btnKanban) {
+    setTimeout(limparVistaKanban, 100);
+  }
+});
+
+// Garante a aplicação ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(limparVistaKanban, 300);
+});
