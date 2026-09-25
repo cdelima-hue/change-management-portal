@@ -1047,35 +1047,33 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-  <div>
-    <label class="block text-xs font-black text-slate-800 mb-1">5. Assigned To (Ingeniero Responsable) *</label>
-    <input type="text" id="inpIngeniero" required placeholder="Ingeniero / Analista asignado" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-500 outline-none shadow-xs">
-  </div>
-  <div>
-    <div class="flex justify-between items-center mb-1">
-      <label class="text-xs font-black text-slate-800">País / Mercado *</label>
-      <div class="flex items-center gap-1">
-        <button type="button" onclick="abrirModalCrearRapidoPais()" class="text-[10px] text-blue-600 font-bold hover:underline" title="Crear nuevo País">+ Nuevo</button>
-        <span class="text-slate-300 text-[10px]">|</span>
-        <button type="button" onclick="abrirModalAdminPaises()" class="text-[10px] text-slate-500 hover:text-slate-800 font-bold" title="Administrar Países">⚙</button>
-      </div>
-    </div>
-    <select id="inpPais" required onchange="filtrarProductosPorPaisFormulario(this.value)" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-500 outline-none shadow-xs">
-    </select>
-  </div>
-  <div>
-    <div class="flex justify-between items-center mb-1">
-      <label class="text-xs font-black text-slate-800">Producto / Línea *</label>
-      <div class="flex items-center gap-1">
-        <button type="button" onclick="abrirModalCrearRapidoProducto()" class="text-[10px] text-blue-600 font-bold hover:underline" title="Crear nuevo Producto">+ Nuevo</button>
-        <span class="text-slate-300 text-[10px]">|</span>
-        <button type="button" onclick="abrirModalAdminProductos()" class="text-[10px] text-slate-500 hover:text-slate-800 font-bold" title="Administrar Productos">⚙</button>
-      </div>
-    </div>
-    <select id="inpProducto" required class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-500 outline-none shadow-xs">
-    </select>
-  </div>
-</div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-800 mb-1">5. Assigned To (Ingeniero Responsable) *</label>
+                        <input type="text" id="inpEngenheiro" required placeholder="Ingeniero / Analista asignado" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-500 outline-none shadow-xs">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-black text-slate-800">País / Mercado *</label>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="abrirModalCrearRapidoPais()" class="text-[10px] text-blue-600 font-bold hover:underline" title="Crear nuevo País">+ Nuevo</button>
+                                <span class="text-slate-300 text-[10px]">|</span>
+                                <button type="button" onclick="abrirModalAdminPaises()" class="text-[10px] text-slate-500 hover:text-slate-800 font-bold" title="Administrar Países">⚙️</button>
+                            </div>
+                        </div>
+                        <select id="inpPais" required onchange="filtrarProductosPorPaisFormulario(this.value)" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-500 outline-none shadow-xs">
+                        </select>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-black text-slate-800">Producto / Línea *</label>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="abrirModalCrearRapidoProducto()" class="text-[10px] text-blue-600 font-bold hover:underline" title="Crear nuevo Producto">+ Nuevo</button>
+                                <span class="text-slate-300 text-[10px]">|</span>
+                                <button type="button" onclick="abrirModalAdminProductos()" class="text-[10px] text-slate-500 hover:text-slate-800 font-bold" title="Administrar Productos">⚙️</button>
+                            </div>
+                        </div>
+                        <select id="inpProduto" required class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-500 outline-none shadow-xs">
+                            <!-- Se puebla dinámicamente desde base de datos -->
                         </select>
                     </div>
                 </div>
