@@ -2973,47 +2973,48 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(limparVistaKanban, 300);
 });
 // ==========================================
-// SINCRONIZAÇÃO AUTOMÁTICA DO KANBAN COM A MATRIZ DE CHECKPOINTS
+// SINCRONIZAÇÃO COMPLETA KANBAN <-> MATRIZ
 // ==========================================
 
-function sincronizarFaseComMatriz(changeId, numeroFase) {
-  // Atualiza no localStorage
+// Função global para avançar fase tanto pela Matriz quanto pelo Kanban
+window.atualizarFaseECheckpoints = function(changeId, novaFase) {
   let cambios = JSON.parse(localStorage.getItem('nestle_changes_v4')) || [];
-  let cambio = cambios.find(c => c.id == changeId || c.number == changeId);
-  
+  let cambio = cambios.find(c => c.id == changeId || c.number == changeId || c.codigo == changeId);
+
   if (cambio) {
-    cambio.faseActual = parseInt(numeroFase);
-    
-    // Atualiza as datas dos checkpoints até a fase atual
+    const numFase = parseInt(novaFase);
+    cambio.faseActual = numFase;
+    cambio.fase = numFase;
+
     if (!cambio.checkpoints) cambio.checkpoints = {};
     const hoy = new Date().toISOString().split('T')[0];
-    
-    for (let i = 1; i <= parseInt(numeroFase); i++) {
-      if (!cambio.checkpoints[i]) {
-        cambio.checkpoints[i] = hoy;
+
+    // Marca todos os checkpoints até a fase selecionada
+    for (let i = 1; i <= 8; i++) {
+      if (i <= numFase) {
+        if (!cambio.checkpoints[i]) cambio.checkpoints[i] = hoy;
+      } else {
+        delete cambio.checkpoints[i]; // Remove se recuar de fase
       }
     }
-    
-    localStorage.setItem('nestle_changes_v4', JSON.stringify(cambios));
-    
-    // Atualiza a tabela da Matriz na tela
-    if (typeof renderizarMatrizCheckpoints === 'function') {
-      renderizarMatrizCheckpoints();
-    }
-  }
-}
 
-// Detecta quando um card é arrastado e solto em uma nova coluna do Kanban
-document.addEventListener('drop', function(e) {
-  const cardArrastado = document.querySelector('.dragging') || e.target.closest('[data-change-id]');
-  const colunaDestino = e.target.closest('[data-fase], [data-coluna], .kanban-column');
-  
-  if (cardArrastado && colunaDestino) {
-    const changeId = cardArrastado.getAttribute('data-change-id') || cardArrastado.id;
-    const numFase = colunaDestino.getAttribute('data-fase') || colunaDestino.getAttribute('data-index');
-    
+    localStorage.setItem('nestle_changes_v4', JSON.stringify(cambios));
+
+    // Atualiza as duas visões na tela imediatamente
+    if (typeof renderizarKanban === 'function') renderizarKanban();
+    if (typeof renderizarMatrizCheckpoints === 'function') renderizarMatrizCheckpoints();
+    if (typeof renderizarTabla === 'function') renderizarTabla();
+  }
+};
+
+// Escuta cliques nos ícones de checkpoint da Matriz (círculos 1 a 8)
+document.addEventListener('click', function(e) {
+  const cellCheckpoint = e.target.closest('[data-checkpoint], .chk-step, [onclick*="checkpoint"]');
+  if (cellCheckpoint) {
+    const changeId = cellCheckpoint.getAttribute('data-change-id') || cellCheckpoint.closest('tr')?.getAttribute('data-id');
+    const numFase = cellCheckpoint.getAttribute('data-fase') || cellCheckpoint.getAttribute('data-step');
     if (changeId && numFase) {
-      setTimeout(() => sincronizarFaseComMatriz(changeId, numFase), 100);
+      window.atualizarFaseECheckpoints(changeId, numFase);
     }
   }
 });
