@@ -3019,43 +3019,54 @@ document.addEventListener('click', function(e) {
   }
 });
 // ==========================================
-// CORREÇÃO DA NAVEGAÇÃO ENTRE ABAS (DASHBOARD / KANBAN / MATRIZ)
+// FIX DEFINTIVO: ALTERNÂNCIA DE ABAS E REFRESH DE GRÁFICOS
 // ==========================================
 
-function alternarVistasNavegacao(nomeVista) {
-  // Oculta todas as secções principais
-  const seccoes = ['sec-kanban', 'sec-matriz', 'sec-dashboard', 'sec-reportes', 'sec-backlog'];
-  
-  seccoes.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
+function alternarVistasEGraficos(nomeVista) {
+  // Oculta o Kanban buscando por classe ou elementos das colunas
+  const conteudoresKanban = document.querySelectorAll('.kanban-board, .kanban-container, [class*="kanban"]');
+  conteudoresKanban.forEach(el => {
+    if (nomeVista === 'dashboard') {
+      el.style.setProperty('display', 'none', 'important');
+    } else if (nomeVista === 'kanban') {
+      el.style.removeProperty('display');
+    }
   });
 
-  // Exibe apenas a secção selecionada
+  // Oculta a Matriz
+  const conteudoresMatriz = document.querySelectorAll('.matriz-checkpoints, [id*="matriz"]');
+  conteudoresMatriz.forEach(el => {
+    if (nomeVista === 'dashboard' || nomeVista === 'kanban') {
+      el.style.setProperty('display', 'none', 'important');
+    } else if (nomeVista === 'matriz') {
+      el.style.removeProperty('display');
+    }
+  });
+
+  // Se clicou no Dashboard, força o recálculo dos gráficos e indicadores
   if (nomeVista === 'dashboard') {
-    const dash = document.getElementById('sec-dashboard') || document.querySelector('[id*="dashboard"]');
-    if (dash) dash.style.display = 'block';
-  } else if (nomeVista === 'kanban') {
-    const kanban = document.getElementById('sec-kanban') || document.querySelector('[id*="kanban"]');
-    if (kanban) kanban.style.display = 'block';
-  } else if (nomeVista === 'matriz') {
-    const matriz = document.getElementById('sec-matriz') || document.querySelector('[id*="matriz"]');
-    if (matriz) matriz.style.display = 'block';
+    setTimeout(() => {
+      if (typeof renderizarDashboard === 'function') renderizarDashboard();
+      if (typeof actualizarMetricas === 'function') actualizarMetricas();
+      if (typeof renderizarGraficos === 'function') renderizarGraficos();
+      if (typeof initCharts === 'function') initCharts();
+      window.dispatchEvent(new Event('resize')); // Força gráficos Canvas/Chart.js a redesenharem
+    }, 150);
   }
 }
 
-// Escuta os cliques nas abas de navegação do topo
+// Escuta os cliques nas abas
 document.addEventListener('click', function(e) {
-  const btn = e.target.closest('button, a');
+  const btn = e.target.closest('button, a, .nav-link');
   if (!btn) return;
 
   const texto = btn.textContent.toLowerCase();
-  
+
   if (texto.includes('dashboard')) {
-    alternarVistasNavegacao('dashboard');
+    alternarVistasEGraficos('dashboard');
   } else if (texto.includes('kanban')) {
-    alternarVistasNavegacao('kanban');
+    alternarVistasEGraficos('kanban');
   } else if (texto.includes('matriz')) {
-    alternarVistasNavegacao('matriz');
+    alternarVistasEGraficos('matriz');
   }
 });
