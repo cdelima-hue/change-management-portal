@@ -3018,3 +3018,44 @@ document.addEventListener('click', function(e) {
     }
   }
 });
+// ==========================================
+// CORREÇÃO DA NAVEGAÇÃO ENTRE ABAS (DASHBOARD / KANBAN / MATRIZ)
+// ==========================================
+
+function alternarVistasNavegacao(nomeVista) {
+  // Oculta todas as secções principais
+  const seccoes = ['sec-kanban', 'sec-matriz', 'sec-dashboard', 'sec-reportes', 'sec-backlog'];
+  
+  seccoes.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  // Exibe apenas a secção selecionada
+  if (nomeVista === 'dashboard') {
+    const dash = document.getElementById('sec-dashboard') || document.querySelector('[id*="dashboard"]');
+    if (dash) dash.style.display = 'block';
+  } else if (nomeVista === 'kanban') {
+    const kanban = document.getElementById('sec-kanban') || document.querySelector('[id*="kanban"]');
+    if (kanban) kanban.style.display = 'block';
+  } else if (nomeVista === 'matriz') {
+    const matriz = document.getElementById('sec-matriz') || document.querySelector('[id*="matriz"]');
+    if (matriz) matriz.style.display = 'block';
+  }
+}
+
+// Escuta os cliques nas abas de navegação do topo
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('button, a');
+  if (!btn) return;
+
+  const texto = btn.textContent.toLowerCase();
+  
+  if (texto.includes('dashboard')) {
+    alternarVistasNavegacao('dashboard');
+  } else if (texto.includes('kanban')) {
+    alternarVistasNavegacao('kanban');
+  } else if (texto.includes('matriz')) {
+    alternarVistasNavegacao('matriz');
+  }
+});
