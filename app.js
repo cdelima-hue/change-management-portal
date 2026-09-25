@@ -2973,48 +2973,21 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(limparVistaKanban, 300);
 });
 // ==========================================
-// SINCRONIZAÇÃO COMPLETA KANBAN <-> MATRIZ
+// REMOÇÃO DA MATRIZ DE CHECKPOINTS (FOCO NO KANBAN)
 // ==========================================
 
-// Função global para avançar fase tanto pela Matriz quanto pelo Kanban
-window.atualizarFaseECheckpoints = function(changeId, novaFase) {
-  let cambios = JSON.parse(localStorage.getItem('nestle_changes_v4')) || [];
-  let cambio = cambios.find(c => c.id == changeId || c.number == changeId || c.codigo == changeId);
+function ocultarMatrizCheckpoints() {
+  // Procura o container da Matriz de Checkpoints e oculta da tela
+  const matriz = document.querySelector('.matriz-checkpoints') || 
+                 document.getElementById('sec-matriz') || 
+                 Array.from(document.querySelectorAll('div, section')).find(el => el.textContent.includes('Matriz de Checkpoints por Fase'));
 
-  if (cambio) {
-    const numFase = parseInt(novaFase);
-    cambio.faseActual = numFase;
-    cambio.fase = numFase;
-
-    if (!cambio.checkpoints) cambio.checkpoints = {};
-    const hoy = new Date().toISOString().split('T')[0];
-
-    // Marca todos os checkpoints até a fase selecionada
-    for (let i = 1; i <= 8; i++) {
-      if (i <= numFase) {
-        if (!cambio.checkpoints[i]) cambio.checkpoints[i] = hoy;
-      } else {
-        delete cambio.checkpoints[i]; // Remove se recuar de fase
-      }
-    }
-
-    localStorage.setItem('nestle_changes_v4', JSON.stringify(cambios));
-
-    // Atualiza as duas visões na tela imediatamente
-    if (typeof renderizarKanban === 'function') renderizarKanban();
-    if (typeof renderizarMatrizCheckpoints === 'function') renderizarMatrizCheckpoints();
-    if (typeof renderizarTabla === 'function') renderizarTabla();
+  if (matriz) {
+    matriz.style.display = 'none';
   }
-};
+}
 
-// Escuta cliques nos ícones de checkpoint da Matriz (círculos 1 a 8)
-document.addEventListener('click', function(e) {
-  const cellCheckpoint = e.target.closest('[data-checkpoint], .chk-step, [onclick*="checkpoint"]');
-  if (cellCheckpoint) {
-    const changeId = cellCheckpoint.getAttribute('data-change-id') || cellCheckpoint.closest('tr')?.getAttribute('data-id');
-    const numFase = cellCheckpoint.getAttribute('data-fase') || cellCheckpoint.getAttribute('data-step');
-    if (changeId && numFase) {
-      window.atualizarFaseECheckpoints(changeId, numFase);
-    }
-  }
+// Garante que a matriz seja ocultada assim que a página carregar
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(ocultarMatrizCheckpoints, 200);
 });
