@@ -2850,3 +2850,82 @@ document.addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(poblarSelectsProductosGlobal, 500);
 });
+// ==========================================
+// SINCRONIZAÇÃO DO CAMPO & POP-UP DE PAÍS / MERCADO
+// ==========================================
+
+// Função para preencher os dropdowns de País com a lista dinâmica
+function poblarSelectsPaisesGlobal() {
+  const listaPaises = (typeof PAISES_CONFIG !== 'undefined' && Array.isArray(PAISES_CONFIG)) 
+    ? PAISES_CONFIG 
+    : JSON.parse(localStorage.getItem('nestle_paises_v4')) || [
+        { id: '1', nombre: 'Perú', horas: 100, maxChange: 30, color: '#0891b2', activo: true },
+        { id: '2', nombre: 'Ecuador', horas: 120, maxChange: 30, color: '#059669', activo: true }
+      ];
+
+  document.querySelectorAll('select').forEach(sel => {
+    const isSelectPais = sel.id.toLowerCase().includes('pais') || 
+                         sel.name === 'pais' || 
+                         sel.previousElementSibling?.textContent.includes('País') ||
+                         Array.from(sel.options).some(opt => opt.value === 'Perú' || opt.text === 'Perú' || opt.value === 'Brasil');
+
+    if (isSelectPais) {
+      const valorAtual = sel.value;
+      sel.innerHTML = '<option value="">Selecciona País...</option>' + 
+        listaPaises.map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join('');
+      if (valorAtual && listaPaises.some(p => p.nombre === valorAtual)) {
+        sel.value = valorAtual;
+      }
+    }
+  });
+}
+
+// Intercepta a abertura e o salvamento pelo pop-up "Nuevo País"
+document.addEventListener('click', function(e) {
+  const btnGuardarPopUp = e.target.closest('button');
+  if (btnGuardarPopUp && (btnGuardarPopUp.textContent.includes('Guardar en Base de Datos') || btnGuardarPopUp.textContent.includes('Guardar'))) {
+    const modalPopUp = btnGuardarPopUp.closest('.modal, [id*="modal"], div[class*="fixed"]');
+    if (modalPopUp && (modalPopUp.textContent.includes('Nuevo País') || modalPopUp.textContent.includes('País / Mercado'))) {
+      const inputNome = modalPopUp.querySelector('input[type="text"]');
+      const inputHoras = modalPopUp.querySelector('input[type="number"]');
+      const nomeNovo = inputNome ? inputNome.value.trim() : '';
+      const horasNovas = inputHoras ? parseInt(inputHoras.value) : 100;
+
+      if (nomeNovo) {
+        if (typeof PAISES_CONFIG === 'undefined' || !Array.isArray(PAISES_CONFIG)) {
+          window.PAISES_CONFIG = JSON.parse(localStorage.getItem('nestle_paises_v4')) || [];
+        }
+
+        if (!PAISES_CONFIG.some(p => p.nombre.toLowerCase() === nomeNovo.toLowerCase())) {
+          const novoPais = {
+            id: Date.now().toString(),
+            nombre: nomeNovo,
+            horas: horasNovas || 100,
+            maxChange: 30,
+            color: '#0891b2',
+            activo: true
+          };
+
+          PAISES_CONFIG.push(novoPais);
+          localStorage.setItem('nestle_paises_v4', JSON.stringify(PAISES_CONFIG));
+          
+          if (typeof renderizarTablaPaises === 'function') renderizarTablaPaises();
+          poblarSelectsPaisesGlobal();
+
+          inputNome.value = '';
+          modalPopUp.classList.add('hidden');
+          if (typeof mostrarToast === 'function') mostrarToast(`País "${nomeNovo}" guardado!`, 'success');
+        }
+      }
+    }
+  }
+
+  if (e.target.closest('#btnNuevaChange, [onclick*="abrirModal"]')) {
+    setTimeout(poblarSelectsPaisesGlobal, 150);
+  }
+});
+
+// Atualiza os selects ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(poblarSelectsPaisesGlobal, 500);
+});
